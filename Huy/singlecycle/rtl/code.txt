@@ -1,0 +1,28 @@
+    lui r1, 0xABCD0
+    addi r2, r1, 0x00 
+    addi r3, r1, 0x00
+    add r4, r2, r3
+    srli r5, r4, 0x10
+    xori r6, r5, 0xFFF
+    slli r7, r6, 0x8
+    srai r8, r3, 0xC
+    ori r9, r8, 0x187
+    andi r10, r8, 0x172
+    sub r11, r5, r10
+    sll r12, r9, r6
+    xor r13, r9, r12
+    srl r14, r13, r6
+    sra r15, r12, r6
+    or r16, r12, r13
+    and r17, r12, r13
+    slt r18, r8, r9
+    sltu r19, r8, r9
+    addi x20, x21, 18
+    addi x21, x22, 17
+    add x23, x21, x24
+
+mul: 	
+    add x22, x22, x20
+    addi x23, x23, -1
+    bne x23, x24, mul
+    
