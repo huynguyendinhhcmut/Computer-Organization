@@ -362,11 +362,11 @@ module classification
 			exp_b			=	8'b0000_0001; // exp_b = -126
 		end
 		
-        if ( a_is_subnormal && b_is_subnormal ) begin 
-			hidden_a		=	1'b1;		
-			exp_a			=	8'b0000_0000; 
-			exp_b			=	8'b0000_0000;
-		end		
+//        if ( a_is_subnormal && b_is_subnormal ) begin 
+//			hidden_a		=	1'b1;		
+//			exp_a			=	8'b0000_0000; 
+//			exp_b			=	8'b0000_0000;
+//		end		
 		
 	end
 	
