@@ -20,16 +20,15 @@ module fpa
 //	output [7:0]  exp_a_in, exp_b_in,
 //	output [22:0] frac_a_in, frac_b_in,	
 	
-	output logic	[7:0]		exp_dif,
-	output logic	[15:0]	exp_dif_pre,
-	output logic	[7:0]		exp_greater,
-	output logic	[63:0]	frac_new,
+//	output logic	[7:0]		exp_dif,
+//	output logic	[7:0]		exp_greater,
+//	output logic	[63:0]	frac_new,
+	
 	
 	// Field slices and unpacked results
-	output logic	      	result_sign,
-	output logic 	[7:0]  	result_exp,
-	output logic 	[4:0]  	lzc_val,
-	output logic 	[22:0] 	result_frac,
+//	output logic	      	result_sign,
+//	output logic 	[7:0]  	result_exp,
+//	output logic 	[22:0] 	result_frac,
 	
 	
 	output logic	[31:0]	result
@@ -58,14 +57,10 @@ module fpa
 	// 		 			Wire / Logic 
 	// ===========================================
 	
-	// Exponent related signals
-//	logic [7:0]  exp_dif;       // Exponent difference after bias adjustment
-//	logic [7:0]  exp_greater;   // The larger of the two exponents
+	logic [7:0]  exp_dif;       // Exponent difference after bias adjustment
+	logic [7:0]  exp_greater;   // The larger of the two exponents
+	logic [63:0] frac_new;      // New fraction after addition/subtraction
 
-	// Internal operation signals
-//	logic [31:0] frac_new;         // New fraction after addition/subtraction
-
-	// Control and status signals
 	logic cout_add_sub;    // Carry out from add/sub operation
 	logic frac_gt;         // Fraction greater than flag
 	logic frac_eq;			  // Fraction equal flag
@@ -74,7 +69,6 @@ module fpa
 	logic cout_exp_dif;
 
 	logic        result_sign_main;
-//	logic [4:0]  lzc_val;
 	logic [7:0]  result_exp_main;
 	logic [22:0] result_frac_main;
 	logic [31:0] normal_result;
@@ -85,14 +79,14 @@ module fpa
 	// ===========================================	
 	
 	// Classification helpers
-	logic a_is_zero, b_is_zero;
-	logic a_is_subnormal, b_is_subnormal;
-	logic a_is_inf, b_is_inf;
-	logic a_is_nan, b_is_nan;
-	logic Ea_is_zero, Eb_is_zero;
-	logic Ea_is_FF, Eb_is_FF;
-	logic Fa_is_zero, Fb_is_zero;
-	logic Fa_is_nzero, Fb_is_nzero;
+	logic a_is_zero,			b_is_zero;
+	logic a_is_subnormal,	b_is_subnormal;
+	logic a_is_inf,			b_is_inf;
+	logic a_is_nan,			b_is_nan;
+	logic Ea_is_zero,			Eb_is_zero;
+	logic Ea_is_FF,			Eb_is_FF;
+	logic Fa_is_zero,			Fb_is_zero;
+	logic Fa_is_nzero,		Fb_is_nzero;
 
 	classification		u_classification
 	(
@@ -139,7 +133,6 @@ module fpa
 		.cout_exp_dif,
 		.cout_add_sub,
 		.exp_greater,
-		.exp_dif_pre,
 		.exp_dif
 	);
 	
@@ -172,10 +165,9 @@ module fpa
 		.exp_greater, 
 		.overflow,
 		.sign_dif,
-		.frac_new,
+		.frac_new, 		
 		
 		.result_exp			(result_exp_main),
-		.lzc_val,
 		.result_frac		(result_frac_main)
 	);
 
@@ -198,9 +190,10 @@ module fpa
 	);
 
 	assign result       = final_result;
-	assign result_sign  = final_result[31];
-	assign result_exp   = final_result[30:23];
-	assign result_frac  = final_result[22:0];
+	
+//	assign result_sign  = final_result[31];
+//	assign result_exp   = final_result[30:23];
+//	assign result_frac  = final_result[22:0];
 	
 endmodule 
 
@@ -370,7 +363,7 @@ module classification
 		end
 		
         if ( a_is_subnormal && b_is_subnormal ) begin 
-			hidden_b		=	1'b1;		
+			hidden_a		=	1'b1;		
 			exp_a			=	8'b0000_0000; 
 			exp_b			=	8'b0000_0000;
 		end		
@@ -399,10 +392,9 @@ module exp_calculation
 	output logic			cout_exp_dif,
 	output logic			cout_add_sub,
 	output logic [7:0]	exp_greater,
-	output logic [15:0]	exp_dif_pre,
 	output logic [7:0]	exp_dif
 );
-//	logic	[15:0]	exp_dif_pre;
+	logic	[15:0]	exp_dif_pre;
 	logic [15:0]	exp_pre;
 
 	// ===========================================
@@ -605,20 +597,24 @@ module normalization
 	input				overflow,
 	input				sign_dif,
 	input	[7:0]		exp_greater,
-	input	[63:0]	frac_new,
+	input	[63:0]	frac_new,	
 	
 	output logic [7:0]	result_exp,
-	output logic [4:0]	lzc_val,
 	output logic [22:0]	result_frac
 );
 	// Internal operation signals
 	logic [63:0] frac_result_1;
+	
 	logic [63:0] frac_result_norm;
+	
 	logic [63:0] frac_result;
 	logic [22:0] result_frac_rne;
+	
 	logic [15:0] result_exp_1;
+	
 	logic [7:0]  exp_result_1;
-//	logic [4:0]  lzc_val;
+	logic [4:0]  lzc_val;
+
    logic [7:0]	 denorm_exp;				// De-normalize exponent
 	logic [63:0] frac_denorm_align;		// De-normalize fraction        
 	
@@ -686,7 +682,7 @@ module normalization
 	);	
 	
 	always_comb begin
-		if (result_exp_1[9]) begin
+		if ( (result_exp_1[15:9]) || (!result_exp_1[7:0]) ) begin
 			// If exp is negative => exp = 0000_0000 (-126, subnormal)
 			result_exp	= denorm_exp;	
 			frac_result	= frac_denorm_align;
@@ -718,9 +714,9 @@ module normalization
 	// ===========================================	
 	
 	always_comb begin
-		if ( result_exp_1[7:0] == 8'hFF ) begin
+		if ( (result_exp_1[7:0] == 8'hFF) && !sign_dif ) begin
 		// If exp is negative => exp = 0000_0000 (-126, subnormal)
-			result_frac = 24'd0;			
+			result_frac = 23'd0;			
 		end else begin
 		// Else is normal
 			result_frac = result_frac_rne;
@@ -858,11 +854,14 @@ module denormalizer
 	logic [7:0] ex_shift;
     
 	 // Calculate amount of extra shift to reach Efield==0
-	 adder_8bits		extra_shift
+	 // ex_shift = 1 - exponent after normalization 
+	 //          = 1 + (~result_exp_1[7:0]) + 1
+	
+	 adder_16bits		extra_shift
 (
-    .operand_a	(8'h01),
-    .operand_b	(result_exp_1[7:0]),
-    .cin			(result_exp_1[9]),
+    .operand_a	(16'h01),
+    .operand_b	(~result_exp_1),
+    .cin			(1'b1),
 
     .sum			(ex_shift),
     .cout		()
