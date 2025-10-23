@@ -112,32 +112,48 @@ assign jal 	 = J_type;
 //     |___|_| |_|___/\__|_|   \__,_|\___|\__|_|\___/|_| |_|___/ |____/ \___|\___\___/ \__,_|\___|_|   
 // 
                                                                                                     					  
-always @(*) begin
+always_comb begin
 	o_pc_sel  = 0; o_rd_wren = 0;       o_imm_sel  = 3'b000; o_insn_vld = 0;     o_br_un    = 0; o_opa_sel = 0; 
 	o_opb_sel = 0; o_alu_op  = 4'b0000; o_mem_wren = 0;      o_wb_sel   = 2'b00; o_data_sel = 0; o_sl_sel  = 3'b000;
 		
 	if (I_type_3) begin
-		o_pc_sel  = 0; o_rd_wren = 1;       o_imm_sel  = 3'b000; o_insn_vld = 1;     o_opa_sel  = 0; 
+		o_pc_sel  = 0; o_rd_wren = 1;       o_imm_sel  = 3'b000; o_opa_sel  = 0; 
 		o_opb_sel = 1; o_alu_op  = 4'b0000; o_mem_wren = 0;      o_wb_sel   = 2'b10; o_data_sel = 1; 
-		if (lb) 		  o_sl_sel  = 3'b000;
-		else if (lh)  o_sl_sel  = 3'b001;
-		else if (lw)  o_sl_sel  = 3'b010;
-		else if (lbu) o_sl_sel  = 3'b011;
-		else if (lhu) o_sl_sel  = 3'b100;
+		if (lb) begin		  
+			o_sl_sel = 3'b000; o_insn_vld = 1;
+		end else if (lh)  begin
+			o_sl_sel = 3'b001; o_insn_vld = 1;
+		end else if (lw)  begin
+			o_sl_sel = 3'b010; o_insn_vld = 1;
+		end else if (lbu) begin 
+			o_sl_sel = 3'b011; o_insn_vld = 1;
+		end else if (lhu) begin
+			o_sl_sel = 3'b100; o_insn_vld = 1;
+		end
 	end
 		
 	else if (I_type_19) begin
-		o_pc_sel  = 0; o_rd_wren = 1;  o_imm_sel = 3'b000; o_insn_vld = 1; o_opa_sel = 0; 
+		o_pc_sel  = 0; o_rd_wren = 1;  o_imm_sel = 3'b000; o_opa_sel = 0; 
 		o_opb_sel = 1; o_mem_wren = 0; o_wb_sel  = 2'b01;  o_data_sel = 0;
-		if (addi)       o_alu_op  = 4'b0000;
-		else if (slli)  o_alu_op  = 4'b0111;	
-		else if (slti)  o_alu_op  = 4'b0010;	
-		else if (sltiu) o_alu_op  = 4'b0011;
-		else if (xori)  o_alu_op  = 4'b0100;	
-		else if (srli)  o_alu_op  = 4'b1000;
-		else if (srai)  o_alu_op  = 4'b1001;
-		else if (ori)   o_alu_op  = 4'b0101;
-		else if (andi)  o_alu_op  = 4'b0110;	
+		if (addi) begin
+			o_alu_op = 4'b0000; o_insn_vld = 1;
+		end else if (slli)  begin
+			o_alu_op = 4'b0111; o_insn_vld = 1;	
+		end else if (slti)  begin
+			o_alu_op = 4'b0010; o_insn_vld = 1;
+		end else if (sltiu) begin
+			o_alu_op = 4'b0011; o_insn_vld = 1;
+		end else if (xori)  begin
+			o_alu_op = 4'b0100; o_insn_vld = 1;
+		end else if (srli)  begin
+			o_alu_op = 4'b1000; o_insn_vld = 1;
+		end else if (srai)  begin
+			o_alu_op = 4'b1001; o_insn_vld = 1;
+		end else if (ori)   begin
+			o_alu_op = 4'b0101; o_insn_vld = 1;
+		end else if (andi)  begin
+			o_alu_op = 4'b0110; o_insn_vld = 1;	
+		end
 	end
 	
 	else if (auipc) begin
@@ -153,16 +169,27 @@ always @(*) begin
 	else if (R_type) begin
 		o_pc_sel  = 0; o_rd_wren = 1;  o_insn_vld = 1;     o_opa_sel = 0; 
 		o_opb_sel = 0; o_mem_wren = 0; o_wb_sel   = 2'b01; o_data_sel = 0;
-		if (add)       o_alu_op = 4'b0000;
-		else if (sub)  o_alu_op = 4'b0001;
-		else if (sll)  o_alu_op = 4'b0111;
-		else if (slt)  o_alu_op = 4'b0010;
-		else if (sltu) o_alu_op = 4'b0011;
-		else if (XOR)  o_alu_op = 4'b0100;
-		else if (srl)  o_alu_op = 4'b1000;
-		else if (sra)  o_alu_op = 4'b1001;
-		else if (OR)   o_alu_op = 4'b0101;
-		else if (AND)  o_alu_op = 4'b0110;
+		if (add) begin
+			o_alu_op = 4'b0000; o_insn_vld = 1;	
+		end else if (sub)  begin  
+			o_alu_op = 4'b0001; o_insn_vld = 1;	
+		end else if (sll)  begin  
+			o_alu_op = 4'b0111; o_insn_vld = 1;	
+		end else if (slt)  begin  
+			o_alu_op = 4'b0010; o_insn_vld = 1;	
+		end else if (sltu) begin 
+			o_alu_op = 4'b0011; o_insn_vld = 1;	
+		end else if (XOR) begin  
+			o_alu_op = 4'b0100; o_insn_vld = 1;	
+		end else if (srl) begin  
+			o_alu_op = 4'b1000; o_insn_vld = 1;	
+		end else if (sra) begin  
+			o_alu_op = 4'b1001; o_insn_vld = 1;	
+		end else if (OR)  begin   
+			o_alu_op = 4'b0101; o_insn_vld = 1;	
+		end else if (AND) begin  
+			o_alu_op = 4'b0110; o_insn_vld = 1;
+		end
 	end
 	
 	else if (lui) begin

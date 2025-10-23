@@ -13,7 +13,7 @@ fullAdder32b fa1 (.a(i_operand_a), .b(i_operand_b), .cin(i_alu_op[0]), .sum(sum)
 comparator32b_signed comp_signed (.a(i_operand_a), .b(i_operand_b), .signed_mode(~i_alu_op[0]), .Lt(less));
 shift shift (.data_in(i_operand_a), .rightleft(i_alu_op[2]), .arith(i_alu_op[0] & i_alu_op[3]), .shift_amount(i_operand_b[4:0]), .data_out(shifted));
 
-always @(*) begin
+always_comb begin
 	case (i_alu_op)
 		4'b0000: o_alu_data = sum;									// ADD
 		4'b0001:	o_alu_data = sum;									// SUB

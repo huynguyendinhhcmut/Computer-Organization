@@ -1,21 +1,21 @@
 module singlecycle (
-	input logic i_clk, 					// Global clock, active on the rising edge.
-	input logic i_rst_n,					// Global low active reset.
-	input logic [31:0] i_io_sw,		// Input for switches.
-	input logic [3:0] i_io_btn,		// Input for buttons.
+	input logic         i_clk, 					// Global clock, active on the rising edge.
+	input logic         i_rst_n,					// Global low active reset.
+	input logic  [31:0] i_io_sw,		// Input for switches.
+	input logic  [3:0]  i_io_btn,		// Input for buttons.
 	
 	output logic [31:0] o_pc_debug,	// Debug program counter.
-	output logic o_insn_vld,			// Instruction valid.
+	output logic        o_insn_vld,			// Instruction valid.
 	output logic [31:0] o_io_ledr,	// Output for driving red LEDs.
 	output logic [31:0] o_io_ledg, 	// Output for driving green LEDs.
-	output logic [6:0] o_io_hex0, 	// Output for driving 7-segment LED0 displays.
-	output logic [6:0] o_io_hex1, 	// Output for driving 7-segment LED1 displays.
-	output logic [6:0] o_io_hex2, 	// Output for driving 7-segment LED2 displays.
-	output logic [6:0] o_io_hex3, 	// Output for driving 7-segment LED3 displays.
-	output logic [6:0] o_io_hex4, 	// Output for driving 7-segment LED4 displays.
-	output logic [6:0] o_io_hex5, 	// Output for driving 7-segment LED5 displays.
-	output logic [6:0] o_io_hex6, 	// Output for driving 7-segment LED6 displays.
-	output logic [6:0] o_io_hex7, 	// Output for driving 7-segment LED7 displays.
+	output logic [6:0]  o_io_hex0, 	// Output for driving 7-segment LED0 displays.
+	output logic [6:0]  o_io_hex1, 	// Output for driving 7-segment LED1 displays.
+	output logic [6:0]  o_io_hex2, 	// Output for driving 7-segment LED2 displays.
+	output logic [6:0]  o_io_hex3, 	// Output for driving 7-segment LED3 displays.
+	output logic [6:0]  o_io_hex4, 	// Output for driving 7-segment LED4 displays.
+	output logic [6:0]  o_io_hex5, 	// Output for driving 7-segment LED5 displays.
+	output logic [6:0]  o_io_hex6, 	// Output for driving 7-segment LED6 displays.
+	output logic [6:0]  o_io_hex7, 	// Output for driving 7-segment LED7 displays.
 	output logic [31:0] o_io_lcd	// Output for driving the LCD register.
 );
 
@@ -31,7 +31,7 @@ logic [1:0] wb_sel;
 logic [2:0] imm_sel, sl_sel;
 logic [3:0] alu_op;
 
-always @(*) begin // pc_next
+always_comb begin // pc_next
 	if (pc_sel)
 		pc_next = alu_data;
 	else
@@ -55,14 +55,14 @@ regfile reg_file (.i_clk(i_clk), .i_rst_n(i_rst_n),
 
 immgen imm_gen (.i_instr(instr[31:7]), .i_imm_sel(imm_sel), .o_immext(immext));
 
-always @(*) begin // select operand a
+always_comb begin // select operand a
 	if (opa_sel)
 		operand_a = pc;
 	else
 		operand_a = rs1_data;
 end
 
-always @(*) begin // select operand b
+always_comb begin // select operand b
 	if (opb_sel)
 		operand_b = immext;
 	else
@@ -82,7 +82,7 @@ lsu lsu1 (.i_clk(i_clk), .i_rst(i_rst_n), .i_lsu_addr(alu_data), .i_st_data(rs2_
 
 datagen data_gen1 (.i_wb_data(wb_data), .i_sl_sel(sl_sel), .o_data_gen(data_gen)); // out data generate
 
-always @(*) begin // final wb data
+always_comb begin // final wb data
 	if (data_sel)
 		final_wb_data = data_gen;
 	else

@@ -4,7 +4,7 @@ module datagen (
 	output logic [31:0] o_data_gen
 );
 
-always @(*) begin
+always_comb begin
 	case (i_sl_sel)
 		3'b000: o_data_gen = {{24{i_wb_data[7]}}, i_wb_data[7:0]};	 // lb
 		3'b001: o_data_gen = {{16{i_wb_data[15]}}, i_wb_data[15:0]}; // lh

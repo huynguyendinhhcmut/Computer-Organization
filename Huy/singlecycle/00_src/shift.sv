@@ -7,7 +7,7 @@ module shift (
 
 logic [31:0] data1, data2, data3, data4, data5, data6;
 
-always @(*) begin
+always_comb begin
 	case (rightleft)
 		1'b0: data1[31:0] = data_in[31:0];
 		1'b1: data1[31:0] = {data_in[0],  data_in[1],  data_in[2],  data_in[3],
@@ -21,7 +21,7 @@ always @(*) begin
 	endcase
 end
 
-always @(*) begin
+always_comb begin
 	case ({arith, shift_amount[4]})
 		2'b00: data2[31:0] = data1[31:0];
 		2'b01: data2[31:0] = {16'b0, data1[31:16]};
@@ -31,7 +31,7 @@ always @(*) begin
 	endcase
 end
 
-always @(*) begin
+always_comb begin
 	case ({arith, shift_amount[3]})
 		2'b00: data3[31:0] = data2[31:0];
 		2'b01: data3[31:0] = {8'b0, data2[31:8]};
@@ -41,7 +41,7 @@ always @(*) begin
 	endcase
 end
 
-always @(*) begin
+always_comb begin
 	case ({arith, shift_amount[2]})
 		2'b00: data4[31:0] = data3[31:0];
 		2'b01: data4[31:0] = {4'b0, data3[31:4]};
@@ -51,7 +51,7 @@ always @(*) begin
 	endcase
 end
 
-always @(*) begin
+always_comb begin
     case ({arith, shift_amount[1]})
       2'b00: data5[31:0] = data4[31:0];
       2'b01: data5[31:0] = {2'b0, data4[31:2]};
@@ -61,7 +61,7 @@ always @(*) begin
     endcase
 end
 
-always @(*) begin
+always_comb begin
     case ({arith, shift_amount[0]})
       2'b00: data6[31:0] = data5[31:0];
       2'b01: data6[31:0] = {1'b0, data5[31:1]};
@@ -71,7 +71,7 @@ always @(*) begin
     endcase
 end
 	
-always @(*) begin
+always_comb begin
         case (rightleft)
                 1'b0: data_out[31:0] = data6[31:0];
                 1'b1: data_out[31:0] = {data6[0],  data6[1],  data6[2],  data6[3],
