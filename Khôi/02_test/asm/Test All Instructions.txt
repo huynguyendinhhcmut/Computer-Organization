@@ -1,0 +1,62 @@
+# Test program for RISC-V instructions in a 5-stage pipeline
+# Starting address: 0x00000000
+# Store before load, test rd after 5 cycles, use rd from previous instruction
+
+# Address  		Instruction		Comment
+0x00000000: 		addi x1, x0, 5      	# x1 = 0x00000005
+0x00000004: 		addi x2, x0, 10     	# x2 = 0x0000000A (delay 1)
+0x00000008: 		addi x3, x0, 255   	# x3 = 0x000000FF (delay 2)
+0x0000000C: 		addi x4, x0, -1     	# x4 = 0xFFFFFFFF (delay 3)
+0x00000010: 		addi x5, x1, 3      	# x5 = x1 + 3 = 8 (delay 4, use x1 after 4 cycles)
+0x00000014: 		sb x5, 0x100(x0)    	# Store x5 (8) to 0x100
+0x00000018: 		sh x2, 0x104(x0)    	# Store x2 (10) to 0x104
+0x0000001C: 		sw x3, 0x108(x0)    	# Store x3 (255) to 0x108
+0x00000020: 		slti x6, x5, 7      	# x6 = (x5 < 7) ? 1 : 0 = 0 (use x5 after 5 cycles)
+0x00000024: 		lb x7, 0x100(x0)    	# x7 = Load byte from 0x100 (should be 8)
+0x00000028: 		lh x8, 0x104(x0)    	# x8 = Load half from 0x104 (should be 10)
+0x0000002C: 		lw x9, 0x108(x0)    	# x9 = Load word from 0x108 (should be 255)
+0x00000030: 		lbu x10, 0x100(x0)  	# x10 = Load unsigned byte from 0x100 (should be 8)
+0x00000034: 		lhu x11, 0x104(x0)  	# x11 = Load unsigned half from 0x104 (should be 10)
+0x00000038: 		sltiu x12, x7, 9    	# x12 = (x7 < 9) ? 1 : 0 = 1 
+0x0000003C: 		xori x13, x8, 0xAA  	# x13 = x8 ^ 0xAA = 0x0A ^ 0xAA = 0xA0 
+0x00000040: 		ori x14, x9, 0x55   	# x14 = x9 | 0x55 = 0xFF | 0x55 = 0xFF 
+0x00000044: 		andi x15, x10, 0xFF 	# x15 = x10 & 0xFF = 0x08 & 0xFF = 0x08 
+0x00000048: 		slli x16, x11, 1    	# x16 = x11 << 1 = 0x0A << 1 = 0x14 
+0x0000004C: 		srli x17, x12, 1    	# x17 = x12 >> 1 = 1 >> 1 = 0 
+0x00000050: 		srai x18, x13, 2    	# x18 = x13 >> 2 = 0xA0 >> 2 = 0x28 (arithmetic) 
+0x00000054: 		auipc x19, 0        	# x19 = PC + 0 = 0x54
+0x00000058: 		lui x20, 0x12345    	# x20 = 0x12345000 (upper 20 bits)
+0x0000005C: 		add x21, x14, x15   	# x21 = x14 + x15 = 0xFF + 0x08 = 0x107
+0x00000060: 		sub x22, x16, x17   	# x22 = x16 - x17 = 0x14 - 0x00 = 0x14
+0x00000064: 		sll x23, x18, x21   	# x23 = x18 << x21 = 0x28 << 0x107, 
+						  Shift only get 5 LSB => 0x28 << 0x07 = 0x1400
+0x00000068: 		slt x24, x19, x20   	# x24 = (x19 < x20) ? 1 : 0 = 1
+0x0000006C: 		sltu x25, x21, x22  	# x25 = (x21 < x22) ? 1 : 0 = 0
+0x00000070: 		xor x26, x23, x24   	# x26 = x23 ^ x24 = 0x1400 ^ 0x01 = 0x1401
+0x00000074: 		or x27, x25, x26    	# x27 = x25 | x26 = 0x00 | 0x1401 = 0x1401
+0x00000078: 		and x28, x27, x20   	# x28 = x27 & x20 = 0x1401 & 0x12345000 = 0x1000
+0x0000007C: 		srl x29, x28, x21   	# x29 = x28 >> x21 = 0x1000 >> 0x107 =  0x1000 >> 0x07 = 0x20
+0x00000080: 		sra x30, x29, x22   	# x30 = x29 >> x22 = 0x20 >> 0x14 = 0x00 (arithmetic) 
+0x00000084: 		beq x1, x2, skip    	# Branch if x1(0x05) == x2(0x0A) (should not take)
+0x00000088: 		bne x3, x4, next    	# Branch if x3(0xFF) != x4(0xFFFFFFFF)	(should take)
+
+/*=Never Execute=*/
+0x0000008C: 		blt x5, x6, skip    	# Branch if x5 < x6 (should not take)
+0x00000090: 		bge x7, x8, next    	# Branch if x7 >= x8 			(should take)
+0x00000094: 		bltu x9, x10, skip  	# Branch if x9 < x10 (should not take)
+0x00000098: 		bgeu x11, x12, next 	# Branch if x11 >= x12 			(should take)
+0x0000009C: 		jal x1, end         	# Jump and link to end (save PC+4 in x1)
+0x000000A0: skip:	addi x0, x0, 0      	# nop (skip label)
+0x000000A4: 		addi x31, x13, 1    	# x31 = x13 + 1 = 0xA1
+/*==============*/
+	   	
+0x000000A8: next: 	jal x3, loop      	# Jump and link register (save PC+4 in x2 = 0xAC) == CALL loop
+0x000000AC: 		jalr x2, x0, 0x84       # Jump and link to loop (save PC+4 in x3 = 0xB0)
+
+0x000000B0: loop:	addi x1, x1, -1     	# x1 = x1 - 1 
+0x000000B4: 		bne x1, x0, loop    	# Branch if x4 != 0 (loop back)
+0x000000B8: end:	addi x0, x0, 0      	# nop (end label)
+0x000000BC: 		jalr x0, x3, 0x0        # RETURN
+
+
+
