@@ -10,23 +10,23 @@
 */
 module lsu
 (
-	input               i_clk,			// Globalclock,active on the rising edge
-	input               i_rst,			// Global active reset 
+	input               i_clk,				// Globalclock,active on the rising edge
+	input               i_rst,				// Global active reset 
 	input   [31:0]      i_lsu_addr,		// Address input (was i_alu_data)
 	input   [31:0]      i_st_data,		// Data to store (was i_rs2_data)
 
 	input               i_lsu_wren,		// Write enable signal (was mem_wren)
-	input   [3:0]       i_bmask,		// Store-Load Type: {op5, funct3}
+	input   [3:0]       i_bmask,			// Store-Load Type: {op5, funct3}
 
-	output  [31:0]      o_ld_data,		// Data read from memory
+	output logic [31:0] o_ld_data,		// Data read from memory
 
 	
 	// I/O Peripheral Inputs 
-	input   [31:0]       i_io_sw,       // Switches				(0x1001_0000 - 0x1001_0FFF)
+	input   [31:0]      i_io_sw,        // Switches					(0x1001_0000 - 0x1001_0FFF)
 	
 	// I/O Peripheral Outputs
-	output logic [31:0] o_io_ledr,		// Red LEDs				(0x1000_0000 - 0x1000_0FFF)
-	output logic [31:0] o_io_ledg,		// Green LEDs			(0x1000_1000 - 0x1000_1FFF)
+	output logic [31:0] o_io_ledr,		// Red LEDs					(0x1000_0000 - 0x1000_0FFF)
+	output logic [31:0] o_io_ledg,		// Green LEDs				(0x1000_1000 - 0x1000_1FFF)
 	output logic [ 7:0] o_io_hex_0,		// 7-segment displays	(0x1000_2000 + offset)
 	output logic [ 7:0] o_io_hex_1,
 	output logic [ 7:0] o_io_hex_2,
@@ -34,34 +34,31 @@ module lsu
 	output logic [ 7:0] o_io_hex_4,		// 7-segment displays	(0x1000_3000 + offset)
 	output logic [ 7:0] o_io_hex_5,
 	output logic [ 7:0] o_io_hex_6,
-	output logic [ 7:0] o_io_hex_7,
-	output logic [31:0] o_io_lcd		// LCD Control Register	(0x1000_4000 - 0x1000_4FFF)
+	output logic [ 7:0] o_io_hex_7
+//	output logic [31:0] o_io_lcd			// LCD Control Register	(0x1000_4000 - 0x1000_4FFF)
 );
 
 /*
 		+----------------------------+-----------------------------------------------+
-		| 		Boundary address     | 		Mapping (Milestone 2 Specification)      |
+		| 		Boundary address       | 		Mapping (Milestone 2 Specification)      |
 		+----------------------------+-----------------------------------------------+
-		| 0x1001_1000 -- 0xFFFF_FFFF | 							( Reserved )         |
-		| 0x1001_0000 -- 0x1001_0FFF | Switches					( Required )         |
-		| 0x1000_5000 -- 0x1000_FFFF | 							( Reserved )         |
+		| 0x1001_1000 -- 0xFFFF_FFFF | 								( Reserved )           |
+		| 0x1001_0000 -- 0x1001_0FFF | Switches					( Required )           |
+		| 0x1000_5000 -- 0x1000_FFFF | 								( Reserved )           |
 		| 0x1000_4000 -- 0x1000_4FFF | LCD Control Registers                         |
 		| 0x1000_3000 -- 0x1000_3FFF | Seven-segment LEDs 7-4                        |
 		| 0x1000_2000 -- 0x1000_2FFF | Seven-segment LEDs 3-0                        |
-		| 0x1000_1000 -- 0x1000_1FFF | Green LEDs 				( Required )         |
-		| 0x1000_0000 -- 0x1000_0FFF | Red LEDs 				( Required )         |
-		| 0x0000_0800 -- 0x0FFF_FFFF | 							( Reserved )         |
-		| 0x0000_0000 -- 0x0000_07FF | Data Memory (2KiB)		( Required )         |
+		| 0x1000_1000 -- 0x1000_1FFF | Green LEDs 				( Required )           |
+		| 0x1000_0000 -- 0x1000_0FFF | Red LEDs 					( Required )           |
+		| 0x0000_0800 -- 0x0FFF_FFFF | 								( Reserved )           |
+		| 0x0000_0000 -- 0x0000_07FF | Data Memory (2KiB)		( Required )           |
 		+----------------------------+-----------------------------------------------+
 		
 		- 0x1001_0XXX	: Input I/O
 		- 0x1000_XXXX	: Output I/O
 		- 0x0000_0XXX	: Data Memory
 
-*/
-// Data Memory: 0x2000 to 0x3FFF (8KiB)
-    localparam DM_SIZE_BYTES = 2048; // 2 KiB
-    
+*/  
     // --- INTERNAL SIGNALS ---
     logic [31:0] ld_data_mux; // Holds the final data to be loaded
     logic        i_dm_access;
@@ -91,7 +88,8 @@ module lsu
 		  .i_rst				(i_rst),
         .i_addr    		(i_lsu_addr),						// Address
         .i_wdata     	(i_st_data),						// Write Data
-        .i_wren       	(i_lsu_wren & i_dm_access),			// Only write if DM is accessed
+        .i_lsu_wren     (i_lsu_wren),						// Only write if DM is accessed
+		  .i_dm_access		(i_dm_access),
         .i_bmask        (i_bmask),
         .o_rdata      	(dm_ld_data)						// Read Data
     );
@@ -104,7 +102,8 @@ module lsu
         .i_rst          (i_rst),
         .i_lsu_addr     (i_lsu_addr),
         .i_wdata      	(i_st_data),
-        .i_wren     	(i_lsu_wren),
+        .i_wren     		(i_lsu_wren),
+		  .i_bmask			(i_bmask),
         .i_out_access   (i_out_access),
         .o_io_ledr      (o_io_ledr),
         .o_io_ledg      (o_io_ledg),
@@ -116,7 +115,7 @@ module lsu
         .o_io_hex_5     (o_io_hex_5),
         .o_io_hex_6     (o_io_hex_6),
         .o_io_hex_7     (o_io_hex_7),
-        .o_io_lcd       (o_io_lcd)
+        .o_io_lcd       ()					//o_io_lcd
     );
 
     // ===========================================
@@ -124,6 +123,7 @@ module lsu
     // ===========================================  
     input_buffer	u_input_buffer (
         .i_clk          (i_clk),
+		  .i_rst				(i_rst),
         .i_lsu_addr     (i_lsu_addr),
         .i_in_access    (i_in_access),
         .i_io_sw        (i_io_sw),
@@ -145,7 +145,6 @@ module lsu
             // Input I/O access
             o_ld_data = in_ld_data;
         end
-        // If reads from the output I/O region (0x70XX) are not defined, so they default to 0.
     end
 	 
 	 
@@ -164,14 +163,15 @@ endmodule
 module memory
 (
     input				i_clk,
-	input				i_rst,
-    input	[31:0]	i_addr,			// Adress input
+	 input				i_rst,
+    input	[31:0]	i_addr,		// Adress input
     input	[31:0]	i_wdata,		// Data to write
 
-    input				i_wren,		// Write enable
-	 input	[3:0]		i_bmask,	//	Store-Load Type
+    input				i_lsu_wren,	// Write enable
+	 input				i_dm_access,
+	 input	[ 3:0]	i_bmask,		//	Store-Load Type
 	 
-    output	[31:0]	o_rdata			// Data read from memory
+    output	[31:0]	o_rdata		// Data read from memory
 );
 
 /*
@@ -180,19 +180,19 @@ module memory
 		+-------+-----------+
 		|i_bmask| function  |
 		|-------|-----------|
-		|  0000 |	 lb	    |
-		|  0001 | 	 lh	    |
-		|  0010 | 	 lw	    |
-		|  0100 | 	 lbu	| 
-		|  0110 | 	 lhu	|
-		|  1000 | 	 sb	    |
-		|  1001 | 	 sh	    |
-		|  1010 | 	 sw	    |
+		|  0000 |	 lb	  |
+		|  0001 | 	 lh	  |
+		|  0010 | 	 lw	  |
+		|  0100 | 	 lbu	  | 
+		|  0110 | 	 lhu	  |
+		|  1000 | 	 sb	  |
+		|  1001 | 	 sh	  |
+		|  1010 | 	 sw	  |
 		+-------+-----------+
 */
 
-	// Data Memory: 0x2000 to 0x3FFF (2KiB)
-	localparam DM_SIZE_BYTES = 2048; 	
+	// Data Memory: 0x0000_0000 to 0x0000_07FF (2KiB)
+	localparam DM_SIZE_BYTES = 1024; 	// 1kib
  
 	// 1024 x 8-bit memory
 	reg [7:0] mem [0:DM_SIZE_BYTES-1];
@@ -200,8 +200,10 @@ module memory
 	// ===========================================
 	// 		 		Internal wire 
 	// ===========================================		
-	logic [ 7:0] Addr;
-   
+	logic [10:0] Addr;
+	logic i_wren;
+	
+   assign i_wren = i_lsu_wren &  i_dm_access;
 	assign Addr = i_addr[10:0];
 
 	// ===========================================
@@ -263,18 +265,18 @@ module output_buffer
 	input   [31:0]      i_lsu_addr,		// Address input (was i_alu_data)
 	input   [31:0]      i_wdata,			// Data to Write (was i_rs2_data)
 
-	input               i_wren,		// Write enable signal (was mem_wren)
+	input               i_wren,			// Write enable signal (was mem_wren)
 	input	  [ 3:0]		  i_bmask,			//	Store-Load Type
 	input               i_out_access,
 
 	// I/O Peripheral Outputs
 	output logic [31:0] o_io_ledr,		// Red LEDs					(0x1000_0000 - 0x1000_0FFF)
-										// 31 - 17 : (Reserved)
-										// 16 -  0 : 17-bit data connected to the array of 17 redLEDs in order.
+													// 31 - 17 : (Reserved)
+													// 16 -  0 : 17-bit data connected to the array of 17 redLEDs in order.
 													
 	output logic [31:0] o_io_ledg,		// Green LEDs				(0x1000_1000 - 0x1000_1FFF)
-										// 31 - 8 : (Reserved)
-										//  7 - 0 :  8-bit data connected to the array of 8 green LEDs in order.
+													// 31 - 8 : (Reserved)
+													//  7 - 0 :  8-bit data connected to the array of 8 green LEDs in order.
 													
 	output logic [ 7:0] o_io_hex_0,		// 7-segment displays	(0x1000_2000 + offset)
 	output logic [ 7:0] o_io_hex_1,
@@ -285,13 +287,13 @@ module output_buffer
 	output logic [ 7:0] o_io_hex_6,
 	output logic [ 7:0] o_io_hex_7,
 	
-	output logic [31:0] o_io_lcd		// LCD Control Register	(0x1000_4000 - 0x1000_4FFF)
-										// 	    31 : ON
-										// 30 - 11 : (Reserved)
-										// 	    10 : EN
-										// 	     9 : RS
-										// 	     8 : R/W
-										//  7 -  0 : Data
+	output logic [31:0] o_io_lcd			// LCD Control Register	(0x1000_4000 - 0x1000_4FFF)
+													// 	  31 : ON
+													// 30 - 11 : (Reserved)
+													// 	  10 : EN
+													// 	   9 : RS
+													// 	   8 : R/W
+													//  7 -  0 : Data
 );
 
 
@@ -314,7 +316,7 @@ module output_buffer
 	logic 			access_hex03;
 	logic 			access_hex47;
 	logic 			access_lcd;
-	logic	[15:0]	Addr;
+	logic	[ 1:0]	Addr;
    
 	assign Addr = i_lsu_addr[1:0];
 
@@ -444,18 +446,32 @@ module input_buffer
 	output logic	[31:0]	o_io_rdata			// Data read from I/O
 );
 
+	logic [31:0] o_io_rdata_temp;
 
+	// ===========================================
+	// 		 			Hold Input 
+	// ===========================================
 	always @(posedge i_clk or negedge i_rst) begin
 		if (!i_rst) begin							
-			o_io_rdata = 32'd0;
-		end else	
-		if (i_in_access) begin							
-			o_io_rdata = i_io_sw;
-		end else begin
-			o_io_rdata = o_io_rdata;
+			o_io_rdata_temp <= 32'd0;
+		end else begin						
+			o_io_rdata_temp <= i_io_sw;
 		end
 	end
-
+	
+	// ===========================================
+	// 		 		Get Input
+	// ===========================================
+	
+	always @(*) begin
+		if (i_in_access) begin							
+			// Currently only the Switches (i_io_sw) are mapped to 0x1001_0xxx
+			o_io_rdata = o_io_rdata_temp;
+		end else begin
+			o_io_rdata = 32'd0; 
+		end
+	end
+	
 endmodule 
 
 
@@ -485,7 +501,7 @@ module io_decoder
 	// Output I/O Access (OUT): 0x1000_0000 to 0x1000_4FFF
 	// Check that bits [31:16] are 16'h1000 (0x1000)
 	// AND bits [15:12] are 4'h0 through 4'h4 (0x0 to 0x4)
-	assign o_out_access = (i_lsu_addr[31:16] == 16'h1000);
+	assign o_out_access = (i_lsu_addr[31:16] == 16'h1000) && (i_lsu_addr[15] == 1'h0);
 
 	// Input I/O Access (IN): 0x1001_0000 to 0x1001_0FFF
 	// Check that bits [31:16] are 16'h1001 (0x1001)
@@ -493,6 +509,5 @@ module io_decoder
 	assign o_in_access = (i_lsu_addr[31:16] == 16'h1001) && (i_lsu_addr[15:12] == 4'h0); 
 	
 endmodule 
-
 
 
