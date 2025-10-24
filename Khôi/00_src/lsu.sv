@@ -10,23 +10,23 @@
 */
 module lsu
 (
-	input               i_clk,				// Globalclock,active on the rising edge
-	input               i_rst,				// Global active reset 
+	input               i_clk,			// Globalclock,active on the rising edge
+	input               i_rst,			// Global active reset 
 	input   [31:0]      i_lsu_addr,		// Address input (was i_alu_data)
 	input   [31:0]      i_st_data,		// Data to store (was i_rs2_data)
 
 	input               i_lsu_wren,		// Write enable signal (was mem_wren)
-	input   [3:0]       i_bmask,			// Store-Load Type: {op5, funct3}
+	input   [3:0]       i_bmask,		// Store-Load Type: {op5, funct3}
 
 	output  [31:0]      o_ld_data,		// Data read from memory
 
 	
 	// I/O Peripheral Inputs 
-	input   [31:0]       i_io_sw,       // Switches					(0x1001_0000 - 0x1001_0FFF)
+	input   [31:0]       i_io_sw,       // Switches				(0x1001_0000 - 0x1001_0FFF)
 	
 	// I/O Peripheral Outputs
-	output logic [31:0] o_io_ledr,		// Red LEDs					(0x1000_0000 - 0x1000_0FFF)
-	output logic [31:0] o_io_ledg,		// Green LEDs				(0x1000_1000 - 0x1000_1FFF)
+	output logic [31:0] o_io_ledr,		// Red LEDs				(0x1000_0000 - 0x1000_0FFF)
+	output logic [31:0] o_io_ledg,		// Green LEDs			(0x1000_1000 - 0x1000_1FFF)
 	output logic [ 7:0] o_io_hex_0,		// 7-segment displays	(0x1000_2000 + offset)
 	output logic [ 7:0] o_io_hex_1,
 	output logic [ 7:0] o_io_hex_2,
@@ -35,23 +35,23 @@ module lsu
 	output logic [ 7:0] o_io_hex_5,
 	output logic [ 7:0] o_io_hex_6,
 	output logic [ 7:0] o_io_hex_7,
-	output logic [31:0] o_io_lcd			// LCD Control Register	(0x1000_4000 - 0x1000_4FFF)
+	output logic [31:0] o_io_lcd		// LCD Control Register	(0x1000_4000 - 0x1000_4FFF)
 );
 
 /*
 		+----------------------------+-----------------------------------------------+
-		| 		Boundary address       | 		Mapping (Milestone 2 Specification)      |
+		| 		Boundary address     | 		Mapping (Milestone 2 Specification)      |
 		+----------------------------+-----------------------------------------------+
-		| 0x1001_1000 -- 0xFFFF_FFFF | 								( Reserved )           |
-		| 0x1001_0000 -- 0x1001_0FFF | Switches					( Required )           |
-		| 0x1000_5000 -- 0x1000_FFFF | 								( Reserved )           |
+		| 0x1001_1000 -- 0xFFFF_FFFF | 							( Reserved )         |
+		| 0x1001_0000 -- 0x1001_0FFF | Switches					( Required )         |
+		| 0x1000_5000 -- 0x1000_FFFF | 							( Reserved )         |
 		| 0x1000_4000 -- 0x1000_4FFF | LCD Control Registers                         |
 		| 0x1000_3000 -- 0x1000_3FFF | Seven-segment LEDs 7-4                        |
 		| 0x1000_2000 -- 0x1000_2FFF | Seven-segment LEDs 3-0                        |
-		| 0x1000_1000 -- 0x1000_1FFF | Green LEDs 				( Required )           |
-		| 0x1000_0000 -- 0x1000_0FFF | Red LEDs 					( Required )           |
-		| 0x0000_0800 -- 0x0FFF_FFFF | 								( Reserved )           |
-		| 0x0000_0000 -- 0x0000_07FF | Data Memory (2KiB)		( Required )           |
+		| 0x1000_1000 -- 0x1000_1FFF | Green LEDs 				( Required )         |
+		| 0x1000_0000 -- 0x1000_0FFF | Red LEDs 				( Required )         |
+		| 0x0000_0800 -- 0x0FFF_FFFF | 							( Reserved )         |
+		| 0x0000_0000 -- 0x0000_07FF | Data Memory (2KiB)		( Required )         |
 		+----------------------------+-----------------------------------------------+
 		
 		- 0x1001_0XXX	: Input I/O
@@ -91,7 +91,7 @@ module lsu
 		  .i_rst				(i_rst),
         .i_addr    		(i_lsu_addr),						// Address
         .i_wdata     	(i_st_data),						// Write Data
-        .i_wren       	(i_lsu_wren & i_dm_access),	// Only write if DM is accessed
+        .i_wren       	(i_lsu_wren & i_dm_access),			// Only write if DM is accessed
         .i_bmask        (i_bmask),
         .o_rdata      	(dm_ld_data)						// Read Data
     );
@@ -104,7 +104,7 @@ module lsu
         .i_rst          (i_rst),
         .i_lsu_addr     (i_lsu_addr),
         .i_wdata      	(i_st_data),
-        .i_wren     		(i_lsu_wren),
+        .i_wren     	(i_lsu_wren),
         .i_out_access   (i_out_access),
         .o_io_ledr      (o_io_ledr),
         .o_io_ledg      (o_io_ledg),
@@ -164,14 +164,14 @@ endmodule
 module memory
 (
     input				i_clk,
-	 input				i_rst,
-    input	[31:0]	i_addr,		// Adress input
+	input				i_rst,
+    input	[31:0]	i_addr,			// Adress input
     input	[31:0]	i_wdata,		// Data to write
 
     input				i_wren,		// Write enable
-	 input	[3:0]		i_bmask,		//	Store-Load Type
+	 input	[3:0]		i_bmask,	//	Store-Load Type
 	 
-    output	[31:0]	o_rdata		// Data read from memory
+    output	[31:0]	o_rdata			// Data read from memory
 );
 
 /*
@@ -180,14 +180,14 @@ module memory
 		+-------+-----------+
 		|i_bmask| function  |
 		|-------|-----------|
-		|  0000 |	 lb	  |
-		|  0001 | 	 lh	  |
-		|  0010 | 	 lw	  |
-		|  0100 | 	 lbu	  | 
-		|  0110 | 	 lhu	  |
-		|  1000 | 	 sb	  |
-		|  1001 | 	 sh	  |
-		|  1010 | 	 sw	  |
+		|  0000 |	 lb	    |
+		|  0001 | 	 lh	    |
+		|  0010 | 	 lw	    |
+		|  0100 | 	 lbu	| 
+		|  0110 | 	 lhu	|
+		|  1000 | 	 sb	    |
+		|  1001 | 	 sh	    |
+		|  1010 | 	 sw	    |
 		+-------+-----------+
 */
 
@@ -269,12 +269,12 @@ module output_buffer
 
 	// I/O Peripheral Outputs
 	output logic [31:0] o_io_ledr,		// Red LEDs					(0x1000_0000 - 0x1000_0FFF)
-													// 31 - 17 : (Reserved)
-													// 16 -  0 : 17-bit data connected to the array of 17 redLEDs in order.
+										// 31 - 17 : (Reserved)
+										// 16 -  0 : 17-bit data connected to the array of 17 redLEDs in order.
 													
 	output logic [31:0] o_io_ledg,		// Green LEDs				(0x1000_1000 - 0x1000_1FFF)
-													// 31 - 8 : (Reserved)
-													//  7 - 0 :  8-bit data connected to the array of 8 green LEDs in order.
+										// 31 - 8 : (Reserved)
+										//  7 - 0 :  8-bit data connected to the array of 8 green LEDs in order.
 													
 	output logic [ 7:0] o_io_hex_0,		// 7-segment displays	(0x1000_2000 + offset)
 	output logic [ 7:0] o_io_hex_1,
@@ -285,13 +285,13 @@ module output_buffer
 	output logic [ 7:0] o_io_hex_6,
 	output logic [ 7:0] o_io_hex_7,
 	
-	output logic [31:0] o_io_lcd			// LCD Control Register	(0x1000_4000 - 0x1000_4FFF)
-													// 	  31 : ON
-													// 30 - 11 : (Reserved)
-													// 	  10 : EN
-													// 	   9 : RS
-													// 	   8 : R/W
-													//  7 -  0 : Data
+	output logic [31:0] o_io_lcd		// LCD Control Register	(0x1000_4000 - 0x1000_4FFF)
+										// 	    31 : ON
+										// 30 - 11 : (Reserved)
+										// 	    10 : EN
+										// 	     9 : RS
+										// 	     8 : R/W
+										//  7 -  0 : Data
 );
 
 
@@ -493,5 +493,6 @@ module io_decoder
 	assign o_in_access = (i_lsu_addr[31:16] == 16'h1001) && (i_lsu_addr[15:12] == 4'h0); 
 	
 endmodule 
+
 
 
