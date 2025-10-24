@@ -1,11 +1,10 @@
 module lsu (
 	input logic         i_clk, 												 // Global clock, active on the rising edge
-	input logic         i_rst, 												 // Global active reset
+	input logic         i_rst_n, 												 // Global active reset
 	input logic  [31:0] i_lsu_addr, 											 // Address for data read/write
 	input logic  [31:0] i_st_data, 											 // Data to be stored
 	input logic         i_lsu_wren, 											 // Write enable signal (1 if writing)
 	input logic  [31:0] i_io_sw, 												 // Input for switches
-	input logic  [3:0]  i_io_btn, 											 // Input for buttons
 	input logic  [2:0]  i_st, 											       // check store type
 	
 	output logic [31:0] o_ld_data, 											 // Data read from memory
