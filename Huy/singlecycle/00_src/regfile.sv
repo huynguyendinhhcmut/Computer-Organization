@@ -1,6 +1,6 @@
 module regfile (
 	input logic i_clk, 					// Global clock.
-	input logic i_rst_n, 				// Global active reset.
+	input logic i_reset, 				// Global active reset.
 	input logic [4:0] i_rs1_addr, 	// Address of the first source register.
 	input logic [4:0] i_rs2_addr, 	// Address of the second source register.
 	input logic [4:0] i_rd_addr, 		// Address of the destination register.
@@ -27,8 +27,8 @@ always_comb begin
     o_rs2_data = register[i_rs2_addr];
 end
   
-always_ff @(posedge i_clk or negedge i_rst_n) begin
-    if (~i_rst_n) begin
+always_ff @(posedge i_clk or negedge i_reset) begin
+    if (~i_reset) begin
       register[0]  <= 0; 
 		register[1]  <= 0; 
 		register[2]  <= 0; 

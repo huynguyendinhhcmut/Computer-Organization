@@ -227,7 +227,7 @@ always_comb begin
 	end
 	
 	else if (jal) begin	  // jal
-		o_pc_sel  = 1; o_rd_wren = 1;       o_imm_sel  = 3'b000; o_insn_vld = 1;     o_opa_sel  = 1; 
+		o_pc_sel  = 1; o_rd_wren = 1;       o_imm_sel  = 3'b011; o_insn_vld = 1;     o_opa_sel  = 1; 
 		o_opb_sel = 1; o_alu_op  = 4'b0000; o_mem_wren = 0;      o_wb_sel   = 2'b00; o_data_sel = 0;
 	end
 	

@@ -4,7 +4,7 @@ module mux2to1 (
 	output logic [31:0] o_data
 );
 
-always @(*) begin
+always_comb begin
 	case (i_sel)
 		1'b0: o_data = i_data_0;
 		1'b1: o_data = i_data_1;

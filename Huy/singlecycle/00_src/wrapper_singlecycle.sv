@@ -20,9 +20,9 @@ module wrapper_singlecycle (
 
 logic clk;
 
-clock_25M clk25M (.clk50(CLOCK_50), .i_rst_n(KEY[0]), .i_clk(clk));  
+clock_25M clk25M (.clk50(CLOCK_50), .i_reset(KEY[0]), .i_clk(clk));  
 
-singlecycle singlecycle1(.i_clk(clk), .i_rst_n(KEY[0]), .i_io_sw(SW[9:0]),
+singlecycle singlecycle1(.i_clk(clk), .i_reset(KEY[0]), .i_io_sw(SW[9:0]),
 								 .o_pc_debug(o_pc_debug), .o_insn_vld(o_insn_vld), .o_io_ledr(o_io_ledr), .o_io_ledg(o_io_ledg),
 								 .o_io_hex0(o_io_hex0), .o_io_hex1(o_io_hex1), .o_io_hex2(o_io_hex2), .o_io_hex3(o_io_hex3),
 								 .o_io_hex4(o_io_hex4), .o_io_hex5(o_io_hex5), .o_io_hex6(o_io_hex6), .o_io_hex7(o_io_hex7), 
