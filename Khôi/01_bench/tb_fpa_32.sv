@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+`timescale 1ns/1ns
 // synopsys translate_off
 // synthesis translate_off
 `ifndef SYNTHESIS
@@ -86,7 +86,7 @@ module tb_fpa_32;
     bit          ok;
     begin
       a = ta; b = tb;
-      #1; // allow comb DUT to settle
+      #1ns; // allow comb DUT to settle
       exp = ref_add32(ta, tb);
       total++;
       ok = (y === exp);
