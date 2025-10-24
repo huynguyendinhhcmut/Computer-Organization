@@ -8,7 +8,8 @@ module controlunit (
 	output logic [2:0] o_imm_sel,
 	output logic [3:0] o_alu_op, 
 	output logic [1:0] o_wb_sel,
-	output logic [2:0] o_sl_sel
+	output logic [2:0] o_sl_sel,
+	output logic [2:0] o_st
 );
 
 logic rv32i;
@@ -18,7 +19,7 @@ logic U_type_23, U_type_55;
 logic lb, lh, lw, lbu, lhu;											// I_type(3)
 logic addi, slli, slti, sltiu, xori, srli, srai, ori, andi;	// I_type(19)
 logic auipc;																// U_type(23)
-//logic sb, sh, sw;														// S_type(35)
+logic sb, sh, sw;														   // S_type(35)
 logic add, sub, sll, slt, sltu, XOR, srl, sra, OR, AND;		// R_type(51)
 logic lui;																	// U_type(55)
 logic beq, bne, blt, bge, bltu, bgeu;								// B_type(99)
@@ -72,9 +73,9 @@ assign andi  =                i_funct3[14] &  i_funct3[13] &  i_funct3[12] & I_t
 assign auipc = U_type_23;
 
 // S_type(35)
-//assign sb    =               ~i_funct3[14] & ~i_funct3[13] & ~i_funct3[12] & S_type;		// funct3 = 000
-//assign sh    =               ~i_funct3[14] & ~i_funct3[13] &  i_funct3[12] & S_type;		// funct3 = 001
-//assign sw    =               ~i_funct3[14] &  i_funct3[13] & ~i_funct3[12] & S_type;		// funct3 = 010
+assign sb    =               ~i_funct3[14] & ~i_funct3[13] & ~i_funct3[12] & S_type;		// funct3 = 000
+assign sh    =               ~i_funct3[14] & ~i_funct3[13] &  i_funct3[12] & S_type;		// funct3 = 001
+assign sw    =               ~i_funct3[14] &  i_funct3[13] & ~i_funct3[12] & S_type;		// funct3 = 010
 
 // R_type(51)
 assign add   = ~i_funct7_5 & ~i_funct3[14] & ~i_funct3[13] & ~i_funct3[12] & R_type;		// funct3 = 000, funct7[30] = 0
@@ -231,5 +232,7 @@ always_comb begin
 	end
 	
 end
+
+assign o_st = {sw, sh, sb};
 	
 endmodule
