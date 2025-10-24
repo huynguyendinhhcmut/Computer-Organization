@@ -11,7 +11,7 @@ module decodelsu (
 
 logic [9:0] mapped_addr_even_1, mapped_addr_even_2, mapped_addr_odd_1, mapped_addr_odd_2;
 logic [9:0] next_addr_even1, next_addr_even2, next_addr_odd1, next_addr_odd2;
-logic [4:0] check;
+logic [3:0] check;
 
 assign check = {i_st, i_lsu_wren};
 
@@ -118,3 +118,4 @@ always_comb begin
 end
 
 endmodule
+
