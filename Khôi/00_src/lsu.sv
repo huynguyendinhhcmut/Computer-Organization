@@ -160,93 +160,100 @@ endmodule
 																					|___/ 
 ==================================================================================================
 */
-module memory
-(
-    input				i_clk,
-	 input				i_rst,
-    input	[31:0]	i_addr,		// Adress input
-    input	[31:0]	i_wdata,		// Data to write
-
-    input				i_lsu_wren,	// Write enable
-	 input				i_dm_access,
-	 input	[ 3:0]	i_bmask,		//	Store-Load Type
-	 
-    output	[31:0]	o_rdata		// Data read from memory
-);
-
-/*
-		i_bmask = {op5, funct3}
-	
-		+-------+-----------+
-		|i_bmask| function  |
-		|-------|-----------|
-		|  0000 |	 lb	  |
-		|  0001 | 	 lh	  |
-		|  0010 | 	 lw	  |
-		|  0100 | 	 lbu	  | 
-		|  0110 | 	 lhu	  |
-		|  1000 | 	 sb	  |
-		|  1001 | 	 sh	  |
-		|  1010 | 	 sw	  |
-		+-------+-----------+
-*/
-
-	// Data Memory: 0x0000_0000 to 0x0000_07FF (2KiB)
-	localparam DM_SIZE_BYTES = 1024; 	// 1kib
- 
-	// 1024 x 8-bit memory
-	reg [7:0] mem [0:DM_SIZE_BYTES-1];
-	
-	// ===========================================
-	// 		 		Internal wire 
-	// ===========================================		
-	logic [10:0] Addr;
-	logic i_wren;
-	
-   assign i_wren = i_lsu_wren &  i_dm_access;
-	assign Addr = i_addr[10:0];
-
-	// ===========================================
-	// 		 		Store operation
-	// ===========================================	
-	
-	always @(posedge i_clk) begin
-	  if (i_wren) begin
-			case (i_bmask)
-				 4'b1000: if (Addr < DM_SIZE_BYTES) begin		// sb
-					mem[Addr] 	<= i_wdata[7:0];
-				end
-				 4'b1001: if (Addr < DM_SIZE_BYTES-1) begin	// sh
-					mem[Addr] 	<= i_wdata[7:0];
-					mem[Addr+1] <= i_wdata[15:8];
-				 end
-				 4'b1010: if (Addr < DM_SIZE_BYTES-3) begin	// sw
-					mem[Addr] 	<= i_wdata[7:0];
-					mem[Addr+1] <= i_wdata[15:8];
-					mem[Addr+2] <= i_wdata[23:16];
-					mem[Addr+3] <= i_wdata[31:24];
-				 end
-				 default: ; // No operation
-			endcase
-	  end
-	end
-
-	// ===========================================
-	// 		 		Load operation
-	// ===========================================	
-
-	always @(*) begin
-	  case (i_bmask)
-			4'b0000: o_rdata = {{24{mem[Addr][7]}},					 	  mem[Addr]};	// lb
-			4'b0001: o_rdata = {{16{mem[Addr+1][7]}},		 mem[Addr+1], mem[Addr]};	// lh
-			4'b0010: o_rdata = {mem[Addr+3], mem[Addr+2], mem[Addr+1], mem[Addr]};	// lw
-			4'b0100: o_rdata = {24'h0, 									 	  mem[Addr]};	// lbu
-			4'b0110: o_rdata = {16'h0,							 mem[Addr+1], mem[Addr]};	// lhu
-			default: o_rdata = 32'h0;
-	  endcase
-	end
-
-endmodule 
+//module memory
+//(
+//    input				i_clk,
+//	 input				i_rst,
+//    input	[31:0]	i_addr,		// Adress input
+//    input	[31:0]	i_wdata,		// Data to write
+//
+//    input				i_lsu_wren,	// Write enable
+//	 input				i_dm_access,
+//	 input	[ 3:0]	i_bmask,		//	Store-Load Type
+//	 
+//    output	[31:0]	o_rdata		// Data read from memory
+//);
+//
+///*
+//		i_bmask = {op5, funct3}
+//	
+//		+-------+-----------+
+//		|i_bmask| function  |
+//		|-------|-----------|
+//		|  0000 |	 lb	  |
+//		|  0001 | 	 lh	  |
+//		|  0010 | 	 lw	  |
+//		|  0100 | 	 lbu	  | 
+//		|  0101 | 	 lhu	  |
+//		|  1000 | 	 sb	  |
+//		|  1001 | 	 sh	  |
+//		|  1010 | 	 sw	  |
+//		+-------+-----------+
+//*/
+//
+//	// Data Memory: 0x0000_0000 to 0x0000_07FF (2KiB)
+//	localparam DM_SIZE_BYTES = 1024; 	// 1kib
+// 
+//	// 1024 x 8-bit memory
+//	logic [7:0] mem [0:DM_SIZE_BYTES-1];
+//	
+//	// ===========================================
+//	// 		 		Internal wire 
+//	// ===========================================		
+//	logic [10:0] Addr0;
+//	logic [10:0] Addr1;
+//	logic [10:0] Addr2;
+//	logic [10:0] Addr3;
+//	logic i_wren;
+//	
+//   assign i_wren = i_lsu_wren &  i_dm_access;
+//	assign Addr0 = i_addr[10:0];
+//	
+//	adder_16bits	u_addr1	(.operand_a({5'd0, Addr0}), .operand_b(16'd1), .cin(1'b0),.sum(Addr1), .cout());
+//	adder_16bits	u_addr2	(.operand_a({5'd0, Addr0}), .operand_b(16'd2), .cin(1'b0),.sum(Addr2), .cout());
+//	adder_16bits	u_addr3	(.operand_a({5'd0, Addr0}), .operand_b(16'd3), .cin(1'b0),.sum(Addr3), .cout());
+//	
+//	// ===========================================
+//	// 		 		Store operation
+//	// ===========================================	
+//	
+//	always @(posedge i_clk) begin
+//	  if (i_wren) begin
+//			case (i_bmask)
+//				 4'b1000: if (Addr0 < DM_SIZE_BYTES) begin	// sb
+//					mem[Addr0] <= i_wdata[7:0];
+//				end
+//				 4'b1001: if (Addr0 < DM_SIZE_BYTES-1) begin	// sh
+//					mem[Addr0] <= i_wdata[7:0];
+//					mem[Addr1] <= i_wdata[15:8];
+//				 end
+//				 4'b1010: if (Addr0 < DM_SIZE_BYTES-3) begin	// sw
+//					mem[Addr0] <= i_wdata[7:0];
+//					mem[Addr1] <= i_wdata[15:8];
+//					mem[Addr2] <= i_wdata[23:16];
+//					mem[Addr3] <= i_wdata[31:24];
+//				 end
+//				 default: ; // No operation
+//			endcase
+//	  end
+//	end
+//
+//	// ===========================================
+//	// 		 		Load operation
+//	// ===========================================	
+//
+//	always @(*) begin
+//	  case (i_bmask)
+//			4'b0000: o_rdata = {{24{mem[Addr0][7]}},					  mem[Addr0]};	// lb
+//			4'b0001: o_rdata = {{16{mem[Addr1][7]}}, 	  mem[Addr1], mem[Addr0]};	// lh
+//			4'b0010: o_rdata = {mem[Addr3], mem[Addr2], mem[Addr1], mem[Addr0]};	// lw
+//			4'b0100: o_rdata = {24'h0, 									  mem[Addr0]};	// lbu
+//			4'b0110: o_rdata = {16'h0,						  mem[Addr1], mem[Addr0]};	// lhu
+//			default: o_rdata = 32'h0;
+//	  endcase
+//	end
+//
+//endmodule 
 
 /*
 ==================================================================================================
