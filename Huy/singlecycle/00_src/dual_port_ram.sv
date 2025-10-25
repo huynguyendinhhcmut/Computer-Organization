@@ -15,7 +15,7 @@ module dual_port_ram (
 );
 
 // Declare the memory array
-logic [7:0] ram [0:1023];
+logic [7:0] ram [0:1023] = '{default: '0};
 
 // Port A operations
 always @(posedge clk) begin

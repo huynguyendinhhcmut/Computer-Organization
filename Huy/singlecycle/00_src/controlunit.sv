@@ -9,7 +9,7 @@ module controlunit (
 	output logic [3:0] o_alu_op, 
 	output logic [1:0] o_wb_sel,
 	output logic [2:0] o_sl_sel,
-	output logic [2:0] o_st
+	output logic [2:0] o_bmask
 );
 
 logic rv32i;
@@ -201,23 +201,42 @@ always_comb begin
 	else if (B_type) begin
 		o_rd_wren = 0; o_imm_sel = 3'b010;  o_insn_vld = 1; o_opa_sel  = 1; 
 		o_opb_sel = 1; o_alu_op  = 4'b0000; o_mem_wren = 0; o_data_sel = 0;
-		if (beq & i_br_equal) begin
-			o_pc_sel = 1; o_br_un = 1;
-		end
-		else if (bne & ~i_br_equal) begin
-			o_pc_sel = 1; o_br_un = 1;
-		end
-		else if (blt & i_br_less) begin
-			o_pc_sel = 1; o_br_un = 1;
-		end
-		else if (bge & (~i_br_less)) begin
-			o_pc_sel = 1; o_br_un = 1;
-		end
-		else if (bltu & i_br_less) begin
-			o_pc_sel = 1; o_br_un = 0;
-		end 
-		else if (bgeu & (~i_br_less)) begin
-			o_pc_sel = 1; o_br_un = 0;
+		if (beq) begin
+			o_br_un = 1;
+			if (i_br_equal) 
+				o_pc_sel = 1;
+			else
+				o_pc_sel = 0;
+		end else if (bne) begin
+			o_br_un = 1;
+			if (~i_br_equal) 
+				o_pc_sel = 1;
+			else
+				o_pc_sel = 0;
+		end else if (blt) begin
+			o_br_un = 1;
+			if (i_br_less) 
+				o_pc_sel = 1;
+			else
+				o_pc_sel = 0;
+		end else if (bge) begin
+			o_br_un = 1;
+			if (~i_br_less) 
+				o_pc_sel = 1;
+			else
+				o_pc_sel = 0;
+		end else if (bltu) begin
+			o_br_un = 0;
+			if (i_br_less) 
+				o_pc_sel = 1;
+			else
+				o_pc_sel = 0;
+		end else if (bgeu) begin
+			o_br_un = 0;
+			if (~i_br_less) 
+				o_pc_sel = 1;
+			else
+				o_pc_sel = 0;
 		end
 	end
 
@@ -233,6 +252,6 @@ always_comb begin
 	
 end
 
-assign o_st = {sw, sh, sb};
+assign o_bmask = {sw, sh, sb};
 	
 endmodule
