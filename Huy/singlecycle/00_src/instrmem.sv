@@ -7,7 +7,7 @@ logic [3:0][7:0] memory [0:1999];
 logic [7:0] temp_mem [0:7999];   
 	
 initial begin
-   $readmemh("program1.txt", temp_mem);
+   $readmemh("/home/yellow/ctmt_cttt_4/workspace/02_test/isa_1b.hex", temp_mem);
 
    memory[0][0] = temp_mem[0];
    memory[0][1] = temp_mem[1];
