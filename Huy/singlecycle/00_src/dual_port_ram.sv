@@ -17,6 +17,13 @@ module dual_port_ram (
 // Declare the memory array
 logic [7:0] ram [0:1023];
 
+integer i;
+initial begin
+    for (i = 0; i < 1024; i = i + 1) begin
+        ram[i] = 8'h00;
+    end
+end
+
 // Port A operations
 always @(posedge clk) begin
 	if (we_a)

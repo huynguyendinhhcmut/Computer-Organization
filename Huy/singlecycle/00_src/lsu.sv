@@ -80,7 +80,7 @@ decodelsu decodelsu1 (.i_lsu_addr(i_lsu_addr), .i_st_data(i_st_data), .i_lsu_wre
 memory mem (.i_clk(i_clk), .i_addr_even_1(addr_even_1), .i_addr_even_2(addr_even_2), .i_addr_odd_1(addr_odd_1), .i_addr_odd_2(addr_odd_2),
 							      .i_data_even_1(data_even_1), .i_data_even_2(data_even_2), .i_data_odd_1(data_odd_1), .i_data_odd_2(data_odd_2),
 							      .i_we_even_1(we_even_1),     .i_we_even_2(we_even_2),     .i_we_odd_1(we_odd_1),     .i_we_odd_2(we_odd_2),
-				.o_data(mem_ld_data));			
+				.o_data(mem_ld_data), .i_lsu_addr(i_lsu_addr[0]));			
 
 //      _                    _            ___        _               _     ____         __  __           
 //     | |    ___   __ _  __| |          / _ \ _   _| |_ _ __  _   _| |_  | __ ) _   _ / _|/ _| ___ _ __ 
@@ -93,7 +93,7 @@ always_comb begin
 	if (addr_is_mem) begin
 		o_ld_data = mem_ld_data;
    end else if (addr_is_sw) begin
-		o_ld_data = {14'b0, i_io_sw[17:0]};
+		o_ld_data = i_io_sw;
    end else if (addr_is_ledr) begin
       o_ld_data = {15'b0, o_io_ledr[16:0]};
    end else if (addr_is_ledg) begin
@@ -133,7 +133,7 @@ always_ff @(posedge i_clk or negedge i_reset) begin
 			if (addr_is_ledr) begin
 				o_io_ledr[16:0] <= i_st_data[16:0]; 
          end else if (addr_is_ledg) begin
-             o_io_ledg[7:0] <= i_st_data[7:0]; 
+            o_io_ledg[7:0] <= i_st_data[7:0]; 
          end else if (addr_is_hex03) begin
 				if (i_bmask == 3'b100) begin
 					o_io_hex0 <= i_st_data[6:0];
