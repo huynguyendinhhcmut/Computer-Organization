@@ -2,6 +2,7 @@ module single_cycle (
 	input logic         i_clk, 		// Global clock, active on the rising edge.
 	input logic         i_reset,		// Global low active reset.
 	input logic  [31:0] i_io_sw,		// Input for switches.
+	input logic  [3:0]  i_io_key,		// Input for keys.
 	
 	output logic [31:0] o_pc_debug,	// Debug program counter.
 	output logic        o_insn_vld,	// Instruction valid.
@@ -74,7 +75,7 @@ brc brc1 (.i_rs1_data(rs1_data), .i_rs2_data(rs2_data), .i_br_un(br_un), .o_br_l
 alu alu1 (.i_operand_a(operand_a), .i_operand_b(operand_b), .i_alu_op(alu_op), .o_alu_data(alu_data)); // alu
 
 lsu lsu1 (.i_clk(i_clk), .i_reset(i_reset), .i_lsu_addr(alu_data), .i_st_data(rs2_data), .i_lsu_wren(mem_wren),
-			 .i_io_sw(i_io_sw), .i_bmask(bmask),
+			 .i_io_sw(i_io_sw), .i_bmask(bmask), .i_io_key(i_io_key),
 			 .o_ld_data(ld_data), .o_io_ledr(o_io_ledr), .o_io_ledg(o_io_ledg),
 			 .o_io_hex0(o_io_hex0), .o_io_hex1(o_io_hex1), .o_io_hex2(o_io_hex2), .o_io_hex3(o_io_hex3), 
 			 .o_io_hex4(o_io_hex4), .o_io_hex5(o_io_hex5), .o_io_hex6(o_io_hex6), .o_io_hex7(o_io_hex7),	
@@ -91,7 +92,7 @@ end
 
 mux4to1 sel_wb_data(.i_data_0(pc_four), .i_data_1(alu_data), .i_data_2(ld_data), .i_data_3(32'b0), .i_sel(wb_sel), .o_data(wb_data)); // wb_data select
 
-controlunit control (.i_op(instr[6:0]), 	  .i_funct3(instr[14:12]), .i_funct7_5(instr[30]), .i_br_less(br_less), .i_br_equal(br_equal),
+controlunit control (.i_op(instr[6:0]), 	  .i_funct3(instr[14:12]), .i_funct7_5(instr[30]), .i_br_less(br_less), .i_br_equal(br_equal), .i_funct7_0(instr[25]),
 							.o_data_sel(data_sel), .o_pc_sel(pc_sel),       .o_rd_wren(rd_wren),    .o_br_un(br_un), 
 							.o_opa_sel(opa_sel),   .o_opb_sel(opb_sel),     .o_mem_wren(mem_wren),  .o_sl_sel(sl_sel),   .o_insn_vld(insn_vld),
 							.o_imm_sel(imm_sel),   .o_alu_op(alu_op),       .o_wb_sel(wb_sel),      .o_bmask(bmask));	// control unit

@@ -6,6 +6,7 @@ module lsu (
 	input logic         i_lsu_wren, 											 // Write enable signal (1 if writing)
 	input logic  [31:0] i_io_sw, 												 // Input for switches
 	input logic  [2:0]  i_bmask, 											    // check store type
+	input logic  [3:0]  i_io_key, 											 // Input for keys
 	
 	output logic [31:0] o_ld_data, 											 // Data read from memory
 	output logic [31:0] o_io_ledr, 											 // Output for red LEDs
@@ -42,6 +43,9 @@ localparam ADDR_LCD_TOP    = 32'h1000_4FFF;
 localparam ADDR_SW_BASE    = 32'h1001_0000; // Input Buffer (Switches)
 localparam ADDR_SW_TOP     = 32'h1001_0FFF;
 
+localparam ADDR_KEY_BASE   = 32'h1000_5000; // Input Buffer (Keys)
+localparam ADDR_KEY_TOP    = 32'h1000_5FFF;
+
 //         _       _     _                     ____                     _           
 //        / \   __| | __| |_ __ ___  ___ ___  |  _ \  ___  ___ ___   __| | ___ _ __ 
 //       / _ \ / _` |/ _` | '__/ _ \/ __/ __| | | | |/ _ \/ __/ _ \ / _` |/ _ \ '__|
@@ -55,6 +59,7 @@ logic addr_is_hex03;
 logic addr_is_hex47;
 logic addr_is_lcd;
 logic addr_is_sw;
+logic addr_is_key;
 
 assign addr_is_mem   = (i_lsu_addr >= ADDR_MEM_BASE)   && (i_lsu_addr <= ADDR_MEM_TOP);
 assign addr_is_ledr  = (i_lsu_addr >= ADDR_LEDR_BASE)  && (i_lsu_addr <= ADDR_LEDR_TOP);
@@ -63,6 +68,7 @@ assign addr_is_hex03 = (i_lsu_addr >= ADDR_HEX03_BASE) && (i_lsu_addr <= ADDR_HE
 assign addr_is_hex47 = (i_lsu_addr >= ADDR_HEX47_BASE) && (i_lsu_addr <= ADDR_HEX47_TOP);
 assign addr_is_lcd   = (i_lsu_addr >= ADDR_LCD_BASE)   && (i_lsu_addr <= ADDR_LCD_TOP);
 assign addr_is_sw    = (i_lsu_addr >= ADDR_SW_BASE)    && (i_lsu_addr <= ADDR_SW_TOP);
+assign addr_is_key   = (i_lsu_addr >= ADDR_KEY_BASE)   && (i_lsu_addr <= ADDR_KEY_TOP);
 
 logic [9:0] addr_even_1, addr_even_2, addr_odd_1, addr_odd_2;
 logic [7:0] data_even_1, data_even_2, data_odd_1, data_odd_2;
@@ -82,18 +88,14 @@ memory mem (.i_clk(i_clk), .i_addr_even_1(addr_even_1), .i_addr_even_2(addr_even
 							      .i_we_even_1(we_even_1),     .i_we_even_2(we_even_2),     .i_we_odd_1(we_odd_1),     .i_we_odd_2(we_odd_2),
 				.o_data(mem_ld_data), .i_lsu_addr(i_lsu_addr[0]));			
 
-//      _                    _            ___        _               _     ____         __  __           
-//     | |    ___   __ _  __| |          / _ \ _   _| |_ _ __  _   _| |_  | __ ) _   _ / _|/ _| ___ _ __ 
-//     | |   / _ \ / _` |/ _` |  _____  | | | | | | | __| '_ \| | | | __| |  _ \| | | | |_| |_ / _ \ '__|
-//     | |__| (_) | (_| | (_| | |_____| | |_| | |_| | |_| |_) | |_| | |_  | |_) | |_| |  _|  _|  __/ |   
-//     |_____\___/ \__,_|\__,_|          \___/ \__,_|\__| .__/ \__,_|\__| |____/ \__,_|_| |_|  \___|_|   
-//                                                      |_|                                                                                                  |_|                                  
 always_comb begin
 	o_ld_data = 32'h0; 
 	if (addr_is_mem) begin
 		o_ld_data = mem_ld_data;
    end else if (addr_is_sw) begin
 		o_ld_data = i_io_sw;
+	end else if (addr_is_key) begin
+		o_ld_data = {28'b0, i_io_key};
    end else if (addr_is_ledr) begin
       o_ld_data = {15'b0, o_io_ledr[16:0]};
    end else if (addr_is_ledg) begin
@@ -109,12 +111,7 @@ always_comb begin
    end
 end
 
-//      ____  _                           ___                   _     ____         __  __           
-//     / ___|| |_ ___  _ __ ___          |_ _|_ __  _ __  _   _| |_  | __ ) _   _ / _|/ _| ___ _ __ 
-//     \___ \| __/ _ \| '__/ _ \  _____   | || '_ \| '_ \| | | | __| |  _ \| | | | |_| |_ / _ \ '__|
-//      ___) | || (_) | | |  __/ |_____|  | || | | | |_) | |_| | |_  | |_) | |_| |  _|  _|  __/ |   
-//     |____/ \__\___/|_|  \___|         |___|_| |_| .__/ \__,_|\__| |____/ \__,_|_| |_|  \___|_|   
-//                                                 |_|                                                                                             |_|                                  
+
 always_ff @(posedge i_clk or negedge i_reset) begin
 	if (~i_reset) begin
 		o_io_ledr <= 32'b0;
@@ -131,9 +128,9 @@ always_ff @(posedge i_clk or negedge i_reset) begin
    end else begin
 		if (i_lsu_wren) begin 
 			if (addr_is_ledr) begin
-				o_io_ledr[16:0] <= i_st_data[16:0]; 
+				o_io_ledr <= {15'b0, i_st_data[16:0]}; 
          end else if (addr_is_ledg) begin
-            o_io_ledg[7:0] <= i_st_data[7:0]; 
+            o_io_ledg <= {24'b0, i_st_data[7:0]}; 
          end else if (addr_is_hex03) begin
 				if (i_bmask == 3'b100) begin
 					o_io_hex0 <= i_st_data[6:0];
@@ -153,6 +150,6 @@ always_ff @(posedge i_clk or negedge i_reset) begin
       end
 		end
 	end
-end	
+end
 
 endmodule

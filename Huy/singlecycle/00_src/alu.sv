@@ -8,10 +8,12 @@ module alu (
 
 logic [31:0] sum, shifted;
 logic less;
+logic [63:0] mul;
 
 fullAdder32b fa1 (.a(i_operand_a), .b(i_operand_b), .cin(i_alu_op[0]), .sum(sum));
 comparator32b_signed comp_signed (.a(i_operand_a), .b(i_operand_b), .signed_mode(~i_alu_op[0]), .Lt(less));
 shift shift (.data_in(i_operand_a), .rightleft(i_alu_op[2]), .arith(i_alu_op[0] & i_alu_op[3]), .shift_amount(i_operand_b[4:0]), .data_out(shifted));
+multiply32x32 mul1 (.a(i_operand_a), .b(i_operand_b), .mul(mul));
 
 always_comb begin
 	case (i_alu_op)
@@ -26,6 +28,8 @@ always_comb begin
 		4'b1000: o_alu_data = shifted;							// SRL
 		4'b1001: o_alu_data = shifted;							// SRA
 		4'b1010: o_alu_data = i_operand_b;						// LUI
+		4'b1011: o_alu_data = mul[31:0];							// MUL
+		4'b1100: o_alu_data = mul[63:32];						// MULHU
 		default: o_alu_data = 32'b0;
 	endcase
 end

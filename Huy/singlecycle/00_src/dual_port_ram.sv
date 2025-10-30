@@ -19,9 +19,9 @@ logic [7:0] ram [0:1023];
 
 integer i;
 initial begin
-    for (i = 0; i < 1024; i = i + 1) begin
-        ram[i] = 8'h00;
-    end
+	for (i = 0; i < 1024; i = i + 1) begin
+		ram[i] = 8'h00;
+	end
 end
 
 // Port A operations

@@ -7,7 +7,7 @@ logic [3:0][7:0] memory [0:1999];
 logic [7:0] temp_mem [0:7999];   
 	
 initial begin
-   $readmemh("program1.txt", temp_mem);
+   $readmemh("program.txt", temp_mem);
 
    memory[0][0] = temp_mem[0];
    memory[0][1] = temp_mem[1];
@@ -28,7 +28,7 @@ initial begin
    memory[3][1] = temp_mem[13];
    memory[3][2] = temp_mem[14];
    memory[3][3] = temp_mem[15];
-
+/*
    memory[4][0] = temp_mem[16];
    memory[4][1] = temp_mem[17];
    memory[4][2] = temp_mem[18];
@@ -10008,7 +10008,7 @@ initial begin
 	memory[1999][1] = temp_mem[7997];
 	memory[1999][2] = temp_mem[7998];
 	memory[1999][3] = temp_mem[7999];
-
+*/
 end
 
 assign o_instr = memory[i_pc[31:2]];

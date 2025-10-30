@@ -2,6 +2,7 @@ module controlunit (
 	input logic [6:0] i_op,
 	input logic [14:12] i_funct3,
 	input logic i_funct7_5,
+	input logic i_funct7_0,
 	input logic i_br_less, i_br_equal,
 	
 	output logic o_data_sel, o_pc_sel, o_rd_wren, o_br_un, o_opa_sel, o_opb_sel, o_mem_wren, o_insn_vld,
@@ -16,15 +17,15 @@ logic rv32i;
 logic R_type, S_type, B_type, J_type;
 logic I_type_3, I_type_19, I_type_103;
 logic U_type_23, U_type_55;
-logic lb, lh, lw, lbu, lhu;											// I_type(3)
-logic addi, slli, slti, sltiu, xori, srli, srai, ori, andi;	// I_type(19)
-logic auipc;																// U_type(23)
-logic sb, sh, sw;														   // S_type(35)
-logic add, sub, sll, slt, sltu, XOR, srl, sra, OR, AND;		// R_type(51)
-logic lui;																	// U_type(55)
-logic beq, bne, blt, bge, bltu, bgeu;								// B_type(99)
-logic jalr;																	// I_type(103)
-logic jal;																	// J_type(111)
+logic lb, lh, lw, lbu, lhu;															// I_type(3)
+logic addi, slli, slti, sltiu, xori, srli, srai, ori, andi;					// I_type(19)
+logic auipc;																				// U_type(23)
+logic sb, sh, sw;														   				// S_type(35)
+logic add, sub, sll, slt, sltu, XOR, srl, sra, OR, AND, mul, mulhu;		// R_type(51)
+logic lui;																					// U_type(55)
+logic beq, bne, blt, bge, bltu, bgeu;												// B_type(99)
+logic jalr;																					// I_type(103)
+logic jal;																					// J_type(111)
 
 //      ___           _                   _   _               _____                      
 //     |_ _|_ __  ___| |_ _ __ _   _  ___| |_(_) ___  _ __   |_   _|   _ _ __   ___  ___ 
@@ -88,6 +89,8 @@ assign srl   = ~i_funct7_5 &  i_funct3[14] & ~i_funct3[13] &  i_funct3[12] & R_t
 assign sra   =  i_funct7_5 &  i_funct3[14] & ~i_funct3[13] &  i_funct3[12] & R_type;		// funct3 = 101, funct7[30] = 1
 assign OR    = ~i_funct7_5 &  i_funct3[14] &  i_funct3[13] & ~i_funct3[12] & R_type;		// funct3 = 110, funct7[30] = 0
 assign AND   = ~i_funct7_5 &  i_funct3[14] &  i_funct3[13] &  i_funct3[12] & R_type;		// funct3 = 111, funct7[30] = 0
+assign mul   =  i_funct7_0 & ~i_funct3[14] & ~i_funct3[13] & ~i_funct3[12] & R_type;		// funct3 = 111, funct7[25] = 1
+assign mulhu =  i_funct7_0 & ~i_funct3[14] &  i_funct3[13] &  i_funct3[12] & R_type;		// funct3 = 111, funct7[25] = 1
 
 // U_type(55)
 assign lui   = U_type_55;
@@ -190,6 +193,10 @@ always_comb begin
 			o_alu_op = 4'b0101; o_insn_vld = 1;	
 		end else if (AND) begin  
 			o_alu_op = 4'b0110; o_insn_vld = 1;
+		end else if (mul) begin  
+			o_alu_op = 4'b1011; o_insn_vld = 1;
+		end else if (mulhu) begin  
+			o_alu_op = 4'b1100; o_insn_vld = 1;
 		end
 	end
 	
