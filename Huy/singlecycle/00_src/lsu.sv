@@ -116,14 +116,6 @@ always_ff @(posedge i_clk or negedge i_reset) begin
 	if (~i_reset) begin
 		o_io_ledr <= 32'b0;
       o_io_ledg <= 32'b0;
-      o_io_hex0 <= 7'b0;
-      o_io_hex1 <= 7'b0;
-      o_io_hex2 <= 7'b0;
-      o_io_hex3 <= 7'b0;
-      o_io_hex4 <= 7'b0;
-      o_io_hex5 <= 7'b0;
-      o_io_hex6 <= 7'b0;
-      o_io_hex7 <= 7'b0;
       o_io_lcd  <= 32'b0;
    end else begin
 		if (i_lsu_wren) begin 
@@ -131,25 +123,46 @@ always_ff @(posedge i_clk or negedge i_reset) begin
 				o_io_ledr <= {15'b0, i_st_data[16:0]}; 
          end else if (addr_is_ledg) begin
             o_io_ledg <= {24'b0, i_st_data[7:0]}; 
-         end else if (addr_is_hex03) begin
-				if (i_bmask == 3'b100) begin
-					o_io_hex0 <= i_st_data[6:0];
-               o_io_hex1 <= i_st_data[14:8];
-               o_io_hex2 <= i_st_data[22:16];
-               o_io_hex3 <= i_st_data[30:24];
-         end
-      end else if (addr_is_hex47) begin
-			if (i_bmask == 3'b100) begin
-               o_io_hex4 <= i_st_data[6:0];
-               o_io_hex5 <= i_st_data[14:8];
-					o_io_hex6 <= i_st_data[22:16];
-               o_io_hex7 <= i_st_data[30:24];
-         end
-      end else if (addr_is_lcd) begin
-         o_io_lcd <= i_st_data;
-      end
+         end else if (addr_is_lcd) begin
+				o_io_lcd <= i_st_data;
+			end
 		end
 	end
 end
+
+logic [3:0] io_hex0, io_hex1, io_hex2, io_hex3, io_hex4, io_hex5, io_hex6, io_hex7;
+
+always_ff @(posedge i_clk or negedge i_reset) begin
+	if (~i_reset) begin
+		io_hex0 <= 4'b0;
+		io_hex1 <= 4'b0;
+		io_hex2 <= 4'b0;
+		io_hex3 <= 4'b0;
+		io_hex4 <= 4'b0;
+		io_hex5 <= 4'b0;
+		io_hex6 <= 4'b0;
+		io_hex7 <= 4'b0;
+	end else if (i_lsu_wren && addr_is_hex03 && (i_bmask == 3'b100)) begin
+		io_hex0 <= i_st_data[3:0];
+      io_hex1 <= i_st_data[11:8];
+      io_hex2 <= i_st_data[19:16];
+      io_hex3 <= i_st_data[27:24];
+	end else if (i_lsu_wren && addr_is_hex47 && (i_bmask == 3'b100)) begin
+		io_hex4 <= i_st_data[3:0];
+      io_hex5 <= i_st_data[11:8];
+      io_hex6 <= i_st_data[19:16];
+      io_hex7 <= i_st_data[27:24];
+	end
+end
+
+decode_hex hexled0 (.in(io_hex0), .out(o_io_hex0));
+decode_hex hexled1 (.in(io_hex1), .out(o_io_hex1));
+decode_hex hexled2 (.in(io_hex2), .out(o_io_hex2));
+decode_hex hexled3 (.in(io_hex3), .out(o_io_hex3));
+
+decode_hex hexled4 (.in(io_hex4), .out(o_io_hex4));
+decode_hex hexled5 (.in(io_hex5), .out(o_io_hex5));
+decode_hex hexled6 (.in(io_hex6), .out(o_io_hex6));
+decode_hex hexled7 (.in(io_hex7), .out(o_io_hex7));
 
 endmodule

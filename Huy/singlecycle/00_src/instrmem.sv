@@ -28,12 +28,12 @@ initial begin
    memory[3][1] = temp_mem[13];
    memory[3][2] = temp_mem[14];
    memory[3][3] = temp_mem[15];
-/*
+
    memory[4][0] = temp_mem[16];
    memory[4][1] = temp_mem[17];
    memory[4][2] = temp_mem[18];
    memory[4][3] = temp_mem[19];
-
+/*
    memory[5][0] = temp_mem[20];
    memory[5][1] = temp_mem[21];
    memory[5][2] = temp_mem[22];
