@@ -33,7 +33,7 @@ initial begin
    memory[4][1] = temp_mem[17];
    memory[4][2] = temp_mem[18];
    memory[4][3] = temp_mem[19];
-/*
+
    memory[5][0] = temp_mem[20];
    memory[5][1] = temp_mem[21];
    memory[5][2] = temp_mem[22];
@@ -478,7 +478,7 @@ initial begin
    memory[93][1] = temp_mem[373];
    memory[93][2] = temp_mem[374];
    memory[93][3] = temp_mem[375];
-
+/*
    memory[94][0] = temp_mem[376];
    memory[94][1] = temp_mem[377];
    memory[94][2] = temp_mem[378];

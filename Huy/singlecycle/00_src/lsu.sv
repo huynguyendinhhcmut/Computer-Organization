@@ -144,14 +144,14 @@ always_ff @(posedge i_clk or negedge i_reset) begin
 		io_hex7 <= 4'b0;
 	end else if (i_lsu_wren && addr_is_hex03 && (i_bmask == 3'b100)) begin
 		io_hex0 <= i_st_data[3:0];
-      io_hex1 <= i_st_data[11:8];
-      io_hex2 <= i_st_data[19:16];
-      io_hex3 <= i_st_data[27:24];
+      io_hex1 <= i_st_data[7:4];
+      io_hex2 <= i_st_data[11:8];
+      io_hex3 <= i_st_data[15:12];
 	end else if (i_lsu_wren && addr_is_hex47 && (i_bmask == 3'b100)) begin
 		io_hex4 <= i_st_data[3:0];
-      io_hex5 <= i_st_data[11:8];
-      io_hex6 <= i_st_data[19:16];
-      io_hex7 <= i_st_data[27:24];
+      io_hex5 <= i_st_data[7:4];
+      io_hex6 <= i_st_data[11:8];
+      io_hex7 <= i_st_data[15:12];
 	end
 end
 
