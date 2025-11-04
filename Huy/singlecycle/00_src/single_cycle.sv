@@ -29,7 +29,7 @@ logic [31:0] ld_data;
 logic pc_sel, rd_wren, opa_sel, opb_sel, br_un, br_less, br_equal, insn_vld, data_sel, mem_wren;
 logic [1:0] wb_sel;
 logic [2:0] imm_sel, sl_sel;
-logic [3:0] alu_op;
+logic [4:0] alu_op;
 logic [2:0] bmask;
 
 always_comb begin // pc_next

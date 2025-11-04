@@ -7,7 +7,7 @@ module controlunit (
 	
 	output logic o_data_sel, o_pc_sel, o_rd_wren, o_br_un, o_opa_sel, o_opb_sel, o_mem_wren, o_insn_vld,
 	output logic [2:0] o_imm_sel,
-	output logic [3:0] o_alu_op, 
+	output logic [4:0] o_alu_op, 
 	output logic [1:0] o_wb_sel,
 	output logic [2:0] o_sl_sel,
 	output logic [2:0] o_bmask
@@ -17,15 +17,15 @@ logic rv32i;
 logic R_type, S_type, B_type, J_type;
 logic I_type_3, I_type_19, I_type_103;
 logic U_type_23, U_type_55;
-logic lb, lh, lw, lbu, lhu;																			// I_type(3)
-logic addi, slli, slti, sltiu, xori, srli, srai, ori, andi;									// I_type(19)
-logic auipc;																								// U_type(23)
-logic sb, sh, sw;														   								// S_type(35)
-logic add, sub, sll, slt, sltu, XOR, srl, sra, OR, AND, mul, mulh, mulhsu, mulhu;	// R_type(51)
-logic lui;																									// U_type(55)
-logic beq, bne, blt, bge, bltu, bgeu;																// B_type(99)
-logic jalr;																									// I_type(103)
-logic jal;																									// J_type(111)
+logic lb, lh, lw, lbu, lhu;																			                     // I_type(3)
+logic addi, slli, slti, sltiu, xori, srli, srai, ori, andi;									                     // I_type(19)
+logic auipc;																								                     // U_type(23)
+logic sb, sh, sw;														   								                     // S_type(35)
+logic add, sub, sll, slt, sltu, XOR, srl, sra, OR, AND, mul, mulh, mulhsu, mulhu, div, divu, rem, remu;	// R_type(51)
+logic lui;																									                     // U_type(55)
+logic beq, bne, blt, bge, bltu, bgeu;																                     // B_type(99)
+logic jalr;																									                     // I_type(103)
+logic jal;																									                     // J_type(111)
 
 //      ___           _                   _   _               _____                      
 //     |_ _|_ __  ___| |_ _ __ _   _  ___| |_(_) ___  _ __   |_   _|   _ _ __   ___  ___ 
@@ -93,6 +93,10 @@ assign mul    =  i_funct7_0 & ~i_funct3[14] & ~i_funct3[13] & ~i_funct3[12] & R_
 assign mulh   =  i_funct7_0 & ~i_funct3[14] & ~i_funct3[13] &  i_funct3[12] & R_type;		// funct3 = 001, funct7[25] = 1
 assign mulhsu =  i_funct7_0 & ~i_funct3[14] &  i_funct3[13] & ~i_funct3[12] & R_type;		// funct3 = 010, funct7[25] = 1
 assign mulhu  =  i_funct7_0 & ~i_funct3[14] &  i_funct3[13] &  i_funct3[12] & R_type;		// funct3 = 011, funct7[25] = 1
+assign div    =  i_funct7_0 &  i_funct3[14] & ~i_funct3[13] & ~i_funct3[12] & R_type;		// funct3 = 100, funct7[25] = 1
+assign divu   =  i_funct7_0 &  i_funct3[14] & ~i_funct3[13] &  i_funct3[12] & R_type;		// funct3 = 101, funct7[25] = 1
+assign rem    =  i_funct7_0 &  i_funct3[14] &  i_funct3[13] & ~i_funct3[12] & R_type;		// funct3 = 110, funct7[25] = 1
+assign remu   =  i_funct7_0 &  i_funct3[14] &  i_funct3[13] &  i_funct3[12] & R_type;		// funct3 = 111, funct7[25] = 1
 
 // U_type(55)
 assign lui   = U_type_55;
@@ -119,12 +123,12 @@ assign jal 	 = J_type;
 // 
                                                                                                     					  
 always_comb begin
-	o_pc_sel  = 0; o_rd_wren = 0;       o_imm_sel  = 3'b000; o_insn_vld = 0;     o_br_un    = 0; o_opa_sel = 0; 
-	o_opb_sel = 0; o_alu_op  = 4'b0000; o_mem_wren = 0;      o_wb_sel   = 2'b00; o_data_sel = 0; o_sl_sel  = 3'b000;
+	o_pc_sel  = 0; o_rd_wren = 0;        o_imm_sel  = 3'b000; o_insn_vld = 0;     o_br_un    = 0; o_opa_sel = 0; 
+	o_opb_sel = 0; o_alu_op  = 5'b00000; o_mem_wren = 0;      o_wb_sel   = 2'b00; o_data_sel = 0; o_sl_sel  = 3'b000;
 		
 	if (I_type_3) begin
-		o_pc_sel  = 0; o_rd_wren = 1;       o_imm_sel  = 3'b000; o_opa_sel  = 0; 
-		o_opb_sel = 1; o_alu_op  = 4'b0000; o_mem_wren = 0;      o_wb_sel   = 2'b10; o_data_sel = 1; 
+		o_pc_sel  = 0; o_rd_wren = 1;        o_imm_sel  = 3'b000; o_opa_sel  = 0; 
+		o_opb_sel = 1; o_alu_op  = 5'b00000; o_mem_wren = 0;      o_wb_sel   = 2'b10; o_data_sel = 1; 
 		if (lb) begin		  
 			o_sl_sel = 3'b000; o_insn_vld = 1;
 		end else if (lh)  begin
@@ -142,78 +146,86 @@ always_comb begin
 		o_pc_sel  = 0; o_rd_wren = 1;  o_imm_sel = 3'b000; o_opa_sel = 0; 
 		o_opb_sel = 1; o_mem_wren = 0; o_wb_sel  = 2'b01;  o_data_sel = 0;
 		if (addi) begin
-			o_alu_op = 4'b0000; o_insn_vld = 1;
+			o_alu_op = 5'b00000; o_insn_vld = 1;
 		end else if (slli)  begin
-			o_alu_op = 4'b0111; o_insn_vld = 1;	
+			o_alu_op = 5'b00111; o_insn_vld = 1;	
 		end else if (slti)  begin
-			o_alu_op = 4'b0010; o_insn_vld = 1;
+			o_alu_op = 5'b00010; o_insn_vld = 1;
 		end else if (sltiu) begin
-			o_alu_op = 4'b0011; o_insn_vld = 1;
+			o_alu_op = 5'b00011; o_insn_vld = 1;
 		end else if (xori)  begin
-			o_alu_op = 4'b0100; o_insn_vld = 1;
+			o_alu_op = 5'b00100; o_insn_vld = 1;
 		end else if (srli)  begin
-			o_alu_op = 4'b1000; o_insn_vld = 1;
+			o_alu_op = 5'b01000; o_insn_vld = 1;
 		end else if (srai)  begin
-			o_alu_op = 4'b1001; o_insn_vld = 1;
+			o_alu_op = 5'b01001; o_insn_vld = 1;
 		end else if (ori)   begin
-			o_alu_op = 4'b0101; o_insn_vld = 1;
+			o_alu_op = 5'b00101; o_insn_vld = 1;
 		end else if (andi)  begin
-			o_alu_op = 4'b0110; o_insn_vld = 1;	
+			o_alu_op = 5'b00110; o_insn_vld = 1;	
 		end
 	end
 	
 	else if (auipc) begin
-		o_pc_sel  = 0; o_rd_wren = 1;       o_imm_sel  = 3'b100; o_insn_vld = 1;     o_opa_sel  = 1; 
-		o_opb_sel = 1; o_alu_op  = 4'b0000; o_mem_wren = 0;      o_wb_sel   = 2'b01; o_data_sel = 0;
+		o_pc_sel  = 0; o_rd_wren = 1;        o_imm_sel  = 3'b100; o_insn_vld = 1;     o_opa_sel  = 1; 
+		o_opb_sel = 1; o_alu_op  = 5'b00000; o_mem_wren = 0;      o_wb_sel   = 2'b01; o_data_sel = 0;
 	end
 	
 	else if (S_type) begin	// sb, sw, sh
-		o_pc_sel  = 0; o_rd_wren = 0;       o_imm_sel  = 3'b001; o_insn_vld = 1;     o_opa_sel  = 0; 
-		o_opb_sel = 1; o_alu_op  = 4'b0000; o_mem_wren = 1;      o_data_sel = 0;	
+		o_pc_sel  = 0; o_rd_wren = 0;        o_imm_sel  = 3'b001; o_insn_vld = 1;     o_opa_sel  = 0; 
+		o_opb_sel = 1; o_alu_op  = 5'b00000; o_mem_wren = 1;      o_data_sel = 0;	
 	end
 
 	else if (R_type) begin
 		o_pc_sel  = 0; o_rd_wren = 1;  o_insn_vld = 1;     o_opa_sel = 0; 
 		o_opb_sel = 0; o_mem_wren = 0; o_wb_sel   = 2'b01; o_data_sel = 0;
 		if (add) begin
-			o_alu_op = 4'b0000; o_insn_vld = 1;	
+			o_alu_op = 5'b00000; o_insn_vld = 1;	
 		end else if (sub)  begin  
-			o_alu_op = 4'b0001; o_insn_vld = 1;	
+			o_alu_op = 5'b00001; o_insn_vld = 1;	
 		end else if (sll)  begin  
-			o_alu_op = 4'b0111; o_insn_vld = 1;	
+			o_alu_op = 5'b00111; o_insn_vld = 1;	
 		end else if (slt)  begin  
-			o_alu_op = 4'b0010; o_insn_vld = 1;	
+			o_alu_op = 5'b00010; o_insn_vld = 1;	
 		end else if (sltu) begin 
-			o_alu_op = 4'b0011; o_insn_vld = 1;	
+			o_alu_op = 5'b00011; o_insn_vld = 1;	
 		end else if (XOR) begin  
-			o_alu_op = 4'b0100; o_insn_vld = 1;	
+			o_alu_op = 5'b00100; o_insn_vld = 1;	
 		end else if (srl) begin  
-			o_alu_op = 4'b1000; o_insn_vld = 1;	
+			o_alu_op = 5'b01000; o_insn_vld = 1;	
 		end else if (sra) begin  
-			o_alu_op = 4'b1001; o_insn_vld = 1;	
+			o_alu_op = 5'b01001; o_insn_vld = 1;	
 		end else if (OR)  begin   
-			o_alu_op = 4'b0101; o_insn_vld = 1;	
+			o_alu_op = 5'b00101; o_insn_vld = 1;	
 		end else if (AND) begin  
-			o_alu_op = 4'b0110; o_insn_vld = 1;
+			o_alu_op = 5'b00110; o_insn_vld = 1;
 		end else if (mul) begin  
-			o_alu_op = 4'b1011; o_insn_vld = 1;
+			o_alu_op = 5'b01011; o_insn_vld = 1;
 		end else if (mulh) begin  
-			o_alu_op = 4'b1100; o_insn_vld = 1;
+			o_alu_op = 5'b01100; o_insn_vld = 1;
 		end else if (mulhsu) begin  
-			o_alu_op = 4'b1101; o_insn_vld = 1;
+			o_alu_op = 5'b01101; o_insn_vld = 1;
 		end else if (mulhu) begin  
-			o_alu_op = 4'b1110; o_insn_vld = 1;
+			o_alu_op = 5'b01110; o_insn_vld = 1;
+		end else if (div) begin  
+			o_alu_op = 5'b01111; o_insn_vld = 1;
+		end else if (divu) begin  
+			o_alu_op = 5'b10000; o_insn_vld = 1;
+		end else if (rem) begin  
+			o_alu_op = 5'b10001; o_insn_vld = 1;
+		end else if (remu) begin  
+			o_alu_op = 5'b10010; o_insn_vld = 1;
 		end
 	end
 	
 	else if (lui) begin
-		o_pc_sel  = 0; o_rd_wren = 1;       o_imm_sel  = 3'b100; o_insn_vld = 1;
-		o_opb_sel = 1; o_alu_op  = 4'b1010; o_mem_wren = 0;      o_wb_sel   = 2'b01; o_data_sel = 0;
+		o_pc_sel  = 0; o_rd_wren = 1;        o_imm_sel  = 3'b100; o_insn_vld = 1;
+		o_opb_sel = 1; o_alu_op  = 5'b01010; o_mem_wren = 0;      o_wb_sel   = 2'b01; o_data_sel = 0;
 	end
 	
 	else if (B_type) begin
-		o_rd_wren = 0; o_imm_sel = 3'b010;  o_insn_vld = 1; o_opa_sel  = 1; 
-		o_opb_sel = 1; o_alu_op  = 4'b0000; o_mem_wren = 0; o_data_sel = 0;
+		o_rd_wren = 0; o_imm_sel = 3'b010;   o_insn_vld = 1; o_opa_sel  = 1; 
+		o_opb_sel = 1; o_alu_op  = 5'b00000; o_mem_wren = 0; o_data_sel = 0;
 		if (beq) begin
 			o_br_un = 1;
 			if (i_br_equal) 
@@ -255,12 +267,12 @@ always_comb begin
 
 	else if (jalr) begin	  // jalr
 		o_pc_sel  = 1; o_rd_wren = 1;       o_imm_sel  = 3'b000; o_insn_vld = 1;     o_opa_sel  = 0; 
-		o_opb_sel = 1; o_alu_op  = 4'b0000; o_mem_wren = 0;      o_wb_sel   = 2'b00; o_data_sel = 0;
+		o_opb_sel = 1; o_alu_op  = 5'b00000; o_mem_wren = 0;      o_wb_sel   = 2'b00; o_data_sel = 0;
 	end
 	
 	else if (jal) begin	  // jal
 		o_pc_sel  = 1; o_rd_wren = 1;       o_imm_sel  = 3'b011; o_insn_vld = 1;     o_opa_sel  = 1; 
-		o_opb_sel = 1; o_alu_op  = 4'b0000; o_mem_wren = 0;      o_wb_sel   = 2'b00; o_data_sel = 0;
+		o_opb_sel = 1; o_alu_op  = 5'b00000; o_mem_wren = 0;      o_wb_sel   = 2'b00; o_data_sel = 0;
 	end
 	
 end
