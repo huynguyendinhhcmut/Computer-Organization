@@ -1148,7 +1148,7 @@ initial begin
    memory[227][1] = temp_mem[909];
    memory[227][2] = temp_mem[910];
    memory[227][3] = temp_mem[911];
-
+/*
    memory[228][0] = temp_mem[912];
    memory[228][1] = temp_mem[913];
    memory[228][2] = temp_mem[914];
@@ -10008,10 +10008,9 @@ initial begin
 	memory[1999][1] = temp_mem[7997];
 	memory[1999][2] = temp_mem[7998];
 	memory[1999][3] = temp_mem[7999];
-
+*/
 end
 
 assign o_instr = memory[i_pc[31:2]];
 
 endmodule
-

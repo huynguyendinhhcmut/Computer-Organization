@@ -13,7 +13,7 @@ logic [63:0] mul;
 fullAdder32b fa1 (.a(i_operand_a), .b(i_operand_b), .cin(i_alu_op[0]), .sum(sum));
 comparator32b_signed comp_signed (.a(i_operand_a), .b(i_operand_b), .signed_mode(~i_alu_op[0]), .Lt(less));
 shift shift (.data_in(i_operand_a), .rightleft(i_alu_op[2]), .arith(i_alu_op[0] & i_alu_op[3]), .shift_amount(i_operand_b[4:0]), .data_out(shifted));
-multiply32x32 mul1 (.a(i_operand_a), .b(i_operand_b), .mul(mul));
+multiplication mul1 (.i_a(i_operand_a), .i_b(i_operand_b), .i_sign_a(~i_alu_op[1]), .i_sign_b(~(i_alu_op[1] ^ i_alu_op[0])), .o_mul(mul));
 
 always_comb begin
 	case (i_alu_op)
@@ -29,7 +29,9 @@ always_comb begin
 		4'b1001: o_alu_data = shifted;							// SRA
 		4'b1010: o_alu_data = i_operand_b;						// LUI
 		4'b1011: o_alu_data = mul[31:0];							// MUL
-		4'b1100: o_alu_data = mul[63:32];						// MULHU
+		4'b1100: o_alu_data = mul[63:32];						// MULH 	 (signed signed)
+		4'b1101:	o_alu_data = mul[63:32];						// MULHsu (signed unsigned)
+		4'b1110:	o_alu_data = mul[63:32];						// MULHU  (unsigned unsigned)
 		default: o_alu_data = 32'b0;
 	endcase
 end
