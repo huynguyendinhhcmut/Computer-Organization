@@ -1,0 +1,611 @@
+    
+
+# =====================================================
+#  RV32I LCD 4-bit demo (no pseudoinstructions)
+#  MMIO @ 0x10004000
+#    bit31 LCD_ON, bit10 EN, bit9 RS, bit8 RW, bit7..0 DATA
+#  Manual CALL/RET via x2 (return stack) storing PC words
+# =====================================================
+
+# =====================================================
+#  Thanh Ghi sử dung:
+# x1  = Address Pointer
+# x2  = Manual Stack Address Pointer
+# x3  = MMIO  LCD (0x10004000)
+# x5  = delay value / 100us
+# x20 = LCD_ON bit mask (bit 31)
+# x21 = EN     bit mask (bit 10)
+# x22 = RS     bit mask (bit 9)
+# x23 = RW     bit mask (bit 8)
+# x24 = D0-7   bit mask (bit 0-7)
+# x25 = LCD DATA (General Purpose)
+# x26 = clear data bit mask
+# =====================================================
+    # x2 = manual return stack pointer
+    addi  x2, x0, 0
+
+    # jump to main
+    jal   x0, main
+
+# ======================================
+# MAIN FUNCTION
+# ======================================
+main:
+    # x3 = LCD MMIO address
+    lui   x3, 0x10004       # => 0x10004000
+
+    # x20 = LCD_ON bit mask (bit 31)
+    # x21 = EN     bit mask (bit 10)
+    # x22 = RS     bit mask (bit 9)
+    # x23 = RW bit mask (bit 8)
+    lui   x20, 0x80000      # => 0x80000000
+    addi  x21, x0, 0x400    # => 0x00000400
+    addi  x22, x0, 0x200    # => 0x00000400
+    addi  x23, x0, 0x100    # => 0x00000400
+    addi  x26, x0, -256     # => 0xffffff00
+
+    # ------------------------------------------------
+    # Bật LCD
+    # ------------------------------------------------
+    add   x25, x0, x0        # Reset x25
+    xor   x25, x0, x20       # LCD_ON=1
+    sw    x25, 0(x3)         # LCD_ON=1, EN=0, RS=0, RW=0, data=0
+ 
+    # delay ~20ms
+    addi  x5, x0, 200
+    jal   x1, delay_100us
+
+    # ------------------------------------------------
+    #   lcd_power_reset_8:
+    # ------------------------------------------------
+	# Command 30h 1st
+	and x25, x25, x26
+	ori x25, x25, 0x30
+	jal x1, lcd_out
+	addi x5, x0, 41		# delay 4.1ms
+	jal x1, delay_100us
+
+
+	# Command 30h 2st
+	and x25, x25, x26
+	ori x25, x25, 0x30
+	jal x1, lcd_out
+	addi x5, x0, 2		# delay 200us
+	jal x1, delay_100us
+
+
+	# Command 30h 3st
+	and x25, x25, x26
+	ori x25, x25, 0x30
+	jal x1, lcd_out
+	addi x5, x0, 2		# delay 200us
+	jal x1, delay_100us
+
+
+    # ------------------------------------------------
+    # lcd_init
+    # RS = 0
+    # ------------------------------------------------
+
+	# 8 bit, 2 dòng, font 5x8
+	and x25, x25, x26
+	ori x25, x25, 0x38	
+	jal x1, lcd_out
+	addi x5, x0, 1		# delay 100us
+	jal x1, delay_100us
+
+
+	# Clear Display
+	and x25, x25, x26
+	ori x25, x25, 0x01	
+	jal x1, lcd_out
+	addi x5, x0, 20		# delay 2ms
+	jal x1, delay_100us
+
+
+	# màn hình on, con trỏ off
+	and x25, x25, x26
+	ori x25, x25, 0x0C	 
+	jal x1, lcd_out
+	addi x5, x0, 1		# delay 100us
+	jal x1, delay_100us
+
+
+	# dịch phải con trỏ, địa chỉ DDRAM tăng 1 khi ghi data
+	and x25, x25, x26
+	ori x25, x25, 0x06	
+	jal x1, lcd_out
+	addi x5, x0, 1		# delay 100us
+	jal x1, delay_100us
+
+
+
+    # ------------------------------------------------
+    # In chuỗi "HELLO"
+    # RS = 1
+    # ------------------------------------------------
+
+	or x25, x25, x22	# RS = 1
+
+	# T
+	and x25, x25, x26
+	ori x25, x25, 0x54	
+	jal x1, lcd_out
+	addi x5, x0, 1		# delay 100us
+	jal x1, delay_100us
+
+   	# H
+	and x25, x25, x26
+	ori x25, x25, 0x48	
+	jal x1, lcd_out
+	addi x5, x0, 1		# delay 100us
+	jal x1, delay_100us
+
+    	# E
+	and x25, x25, x26
+	ori x25, x25, 0x45	
+	jal x1, lcd_out
+	addi x5, x0, 1		# delay 100us
+	jal x1, delay_100us
+
+    	# 
+	and x25, x25, x26
+	ori x25, x25, 0x20	
+	jal x1, lcd_out
+	addi x5, x0, 1		# delay 100us
+	jal x1, delay_100us
+
+   	# 3
+ 	and x25, x25, x26
+	ori x25, x25, 0x33	
+	jal x1, lcd_out
+	addi x5, x0, 1		# delay 100us
+	jal x1, delay_100us
+
+	# 
+	and x25, x25, x26
+	ori x25, x25, 0x20	
+	jal x1, lcd_out
+	addi x5, x0, 1		# delay 100us
+	jal x1, delay_100us
+
+	# M
+	and x25, x25, x26
+	ori x25, x25, 0x4d	
+	jal x1, lcd_out
+	addi x5, x0, 1		# delay 100us
+	jal x1, delay_100us
+
+	# U
+	and x25, x25, x26
+	ori x25, x25, 0x55	
+	jal x1, lcd_out
+	addi x5, x0, 1		# delay 100us
+	jal x1, delay_100us
+
+	# S
+	and x25, x25, x26
+	ori x25, x25, 0x53	
+	jal x1, lcd_out
+	addi x5, x0, 1		# delay 100us
+	jal x1, delay_100us
+
+	# K
+	and x25, x25, x26
+	ori x25, x25, 0x4B	
+	jal x1, lcd_out
+	addi x5, x0, 1		# delay 100us
+	jal x1, delay_100us
+
+	# E
+	and x25, x25, x26
+	ori x25, x25, 0x45	
+	jal x1, lcd_out
+	addi x5, x0, 1		# delay 100us
+	jal x1, delay_100us
+
+	# T
+	and x25, x25, x26
+	ori x25, x25, 0x54	
+	jal x1, lcd_out
+	addi x5, x0, 1		# delay 100us
+	jal x1, delay_100us
+
+	# E
+	and x25, x25, x26
+	ori x25, x25, 0x45	
+	jal x1, lcd_out
+	addi x5, x0, 1		# delay 100us
+	jal x1, delay_100us
+
+	# E
+	and x25, x25, x26
+	ori x25, x25, 0x45	
+	jal x1, lcd_out
+	addi x5, x0, 1		# delay 100us
+	jal x1, delay_100us
+
+	# R
+	and x25, x25, x26
+	ori x25, x25, 0x52	
+	jal x1, lcd_out
+	addi x5, x0, 1		# delay 100us
+	jal x1, delay_100us
+
+	# S
+	and x25, x25, x26
+	ori x25, x25, 0x53	
+	jal x1, lcd_out
+	addi x5, x0, 1		# delay 100us
+	jal x1, delay_100us
+
+    # ------------------------------------------------
+    # Infinite loop
+    # ------------------------------------------------
+infinite_loop:
+    jal x0, stopwatch
+
+
+
+
+
+# =========================
+#   lcd_out:
+#   x25 = data, toggle E to print
+#   Default E = 0
+# =========================
+lcd_out:
+	or  x25, x25, x21	# E = 1
+	sw    x25, 0(x3)
+
+	# delay  450ns
+	addi x0, x0, 0		# NOP (40ns)
+	addi x0, x0, 0		# NOP
+	addi x0, x0, 0		# NOP
+	addi x0, x0, 0		# NOP
+
+	addi x0, x0, 0		# NOP
+	addi x0, x0, 0		# NOP
+	addi x0, x0, 0		# NOP
+	addi x0, x0, 0		# NOP
+
+	addi x0, x0, 0		# NOP
+	addi x0, x0, 0		# NOP
+	addi x0, x0, 0		# NOP
+	addi x0, x0, 0		# NOP (480ns)
+
+
+	xor x25, x25, x21	# E = 0
+	sw    x25, 0(x3)
+
+    jalr  x0, x1, 0		# Return
+
+
+
+# =========================
+#   delay_100us:
+#   x5 = count, mỗi vòng ~100µs @ 25 MHz
+# =========================
+delay_100us:
+    # Outer loop over x5
+delay_100us_loop:
+    addi  x7, x0, 1249		# N ≈ (25e6*100e-6 - 3)/2 = 1249
+dly_inner:
+    addi  x7, x7, -1
+    bne   x7, x0, dly_inner
+
+    addi  x5, x5, -1
+    bne   x5, x0, delay_100us_loop
+
+    jalr  x0, x1, 0
+
+stopwatch:
+    li x0, 0
+    li x1, 0
+    li x2, 0
+    li x3, 0
+    li x4, 0
+    li x7, 0
+    li x8, 0
+    li x9, 0
+    li x11, 0
+    li x12, 0
+    li x13, 0
+    li x14, 0
+    li x15, 0
+    li x16, 0
+    li x17, 0
+    li x18, 0
+    li x19, 0
+    li x20, 0
+    li x21, 0
+    li x22, 0
+    li x23, 0
+    li x24, 0
+    li x25, 0
+    li x26, 0
+    li x27, 0
+    li x28, 0
+    li x29, 0
+    li x30, 0
+    li x31, 0
+ 
+    li x5, 0x10002000       # địa chỉ LED
+    li x6, 0x10010000       # địa chỉ SW
+    li x10, 0x1             # detect KEY[0]
+
+main_loop:
+    li x7, -1               # -1 + 1 = 0 (00:00)
+    li x8, 0b1001           # 0_1001 = 00:09
+    jal x2, add1tohex
+    
+    li x7, 0b1111           # 1111 + 1 = 1_0000 (00:10)
+    li x8, 0b11001          # 1_1001 = 00:19
+    jal x2, add1tohex
+    
+    li x7, 0b11111          # 1_1111 + 1 = 10_0000 (00:20)
+    li x8, 0b101001         # 10_1001 = 00:29
+    jal x2, add1tohex
+    
+    li x7, 0b101111         # 10_1111 + 1 = 11_0000 (00:30)
+    li x8, 0b111001         # 11_1001 = 00:39
+    jal x2, add1tohex
+    
+    li x7, 0b111111         # 11_1111 + 1 = 100_0000 (00:40)
+    li x8, 0b1001001        # 100_1001 = 00:49
+    jal x2, add1tohex
+    
+    li x7, 0b1001111        # 100_1111 + 1 = 101_0000 (00:50)
+    li x8, 0b1011001        # 101_1001 = 00:59
+    jal x2, add1tohex
+    
+    li x7, 0b11111111       # 0 = 01:00
+    li x8, 0b100001001      # 1_0000_1001 = 01:09
+    jal x2, add1tohex
+    
+    li x7, 0b100001111      # 1_0000_1111 + 1 = 1_0001_0000 (01:10)
+    li x8, 0b100011001      # 1_0001_1001 = 01:19
+    jal x2, add1tohex
+    
+    li x7, 0b100011111      # 1_0001_1111 + 1 = 1_0010_0000 (01:20)
+    li x8, 0b100101001      # 1_0010_1001 = 01:29
+    jal x2, add1tohex
+    
+    li x7, 0b100101111      # 1_0010_1111 + 1 = 1_0011_0000 (01:30)
+    li x8, 0b100111001      # 1_0011_1001 = 01:39
+    jal x2, add1tohex
+    
+    li x7, 0b100111111      # 1_0011_1111 + 1 = 1_0100_0000 (01:40)
+    li x8, 0b101001001      # 1_0100_1001 = 01:49
+    jal x2, add1tohex
+    
+    li x7, 0b101001111      # 1_0100_1111 + 1 = 1_0101_0000 (01:50)
+    li x8, 0b101011001      # 1_0101_1001 = 01:59
+    jal x2, add1tohex
+    
+    li x7, 0b111111111      # 1_1111_1111 + 1 = 10_0000_0000 (02:00)
+    li x8, 0b1000001001     # 10_0000_1001 = 02:09
+    jal x2, add1tohex
+    
+    li x7, 0b1000001111     # 10_0000_1111 + 1 = 10_0001_0000 (02:10)
+    li x8, 0b1000011001     # 10_0001_1001 = 02:19
+    jal x2, add1tohex
+    
+    li x7, 0b1000011111     # 10_0001_1111 + 1 = 10_0010_0000 (02:20)
+    li x8, 0b1000101001     # 10_0010_1001 = 02:29
+    jal x2, add1tohex
+    
+    li x7, 0b1000101111     # 10_0010_1111 + 1 = 10_0011_0000 (02:30)
+    li x8, 0b1000111001     # 10_0011_1001 = 02:39
+    jal x2, add1tohex
+    
+    li x7, 0b1000111111     # 10_0011_1111 + 1 = 10_0100_0000 (02:40)
+    li x8, 0b1001001001     # 10_0100_1001 = 02:49
+    jal x2, add1tohex
+    
+    li x7, 0b1001001111     # 10_0100_1111 + 1 = 10_0101_0000 (02:50)
+    li x8, 0b1001011001     # 10_0101_1001 = 02:59
+    jal x2, add1tohex
+    
+    li x7, 0b1011111111     # 10_1111_1111 + 1 = 11_0000_0000 (03:00)
+    li x8, 0b1100001001     # 11_0000_1001 = 03:09
+    jal x2, add1tohex
+    
+    li x7, 0b1100001111     # 11_0000_1111 + 1 = 11_0001_0000 (03:10)
+    li x8, 0b1100011001     # 11_0001_1001 = 03:19
+    jal x2, add1tohex
+    
+    li x7, 0b1100011111     # 11_0001_1111 + 1 = 11_0010_0000 (03:20)
+    li x8, 0b1100101001     # 11_0010_1001 = 03:29
+    jal x2, add1tohex
+    
+    li x7, 0b1100101111     # 11_0010_1111 + 1 = 11_0011_0000 (03:30)
+    li x8, 0b1100111001     # 11_0011_1001 = 03:39
+    jal x2, add1tohex
+    
+    li x7, 0b1100111111     # 11_0011_1111 + 1 = 11_0100_0000 (03:40)
+    li x8, 0b1101001001     # 11_0100_1001 = 03:49
+    jal x2, add1tohex
+    
+    li x7, 0b1101001111     # 11_0100_1111 + 1 = 11_0101_0000 (03:50)
+    li x8, 0b1101011001     # 11_0101_1001 = 03:59
+    jal x2, add1tohex
+    
+    li x7, 0b1111111111     # 11_1111_1111 + 1 = 100_0000_0000 (04:00)
+    li x8, 0b10000001001    # 100_0000_1001 = 04:09
+    jal x2, add1tohex
+    
+    li x7, 0b10000001111    # 100_0000_1111 + 1 = 100_0001_0000 (04:10)
+    li x8, 0b10000011001    # 100_0001_1001 = 04:19
+    jal x2, add1tohex
+    
+    li x7, 0b10000011111    # 100_0001_1111 + 1 = 100_0010_0000 (04:20)
+    li x8, 0b10000101001    # 100_0010_1001 = 04:29
+    jal x2, add1tohex
+    
+    li x7, 0b10000101111    # 100_0010_1111 + 1 = 100_0011_0000 (04:30)
+    li x8, 0b10000111001    # 100_0011_1001 = 04:39
+    jal x2, add1tohex
+    
+    li x7, 0b10000111111    # 100_0011_1111 + 1 = 100_0100_0000 (04:40)
+    li x8, 0b10001001001    # 100_0100_1001 = 04:49
+    jal x2, add1tohex
+    
+    li x7, 0b10001001111    # 100_0100_1111 + 1 = 100_0101_0000 (04:50)
+    li x8, 0b10001011001    # 100_0101_1001 = 04:59
+    jal x2, add1tohex
+    
+    li x7, 0b10011111111    # 100_1111_1111 + 1 = 101_0000_0000 (05:00)
+    li x8, 0b10100001001    # 101_0000_1001 = 05:09
+    jal x2, add1tohex
+    
+    li x7, 0b10100001111    # 101_0000_1111 + 1 = 101_0001_0000 (05:10)
+    li x8, 0b10100011001    # 101_0001_1001 = 05:19
+    jal x2, add1tohex
+    
+    li x7, 0b10100011111    # 101_0001_1111 + 1 = 101_0010_0000 (05:20)
+    li x8, 0b10100101001    # 101_0010_1001 = 05:29
+    jal x2, add1tohex
+    
+    li x7, 0b10100101111    # 101_0010_1111 + 1 = 101_0011_0000 (05:30)
+    li x8, 0b10100111001    # 101_0011_1001 = 05:39
+    jal x2, add1tohex
+    
+    li x7, 0b10100111111    # 101_0011_1111 + 1 = 101_0100_0000 (05:40)
+    li x8, 0b10101001001    # 101_0100_1001 = 05:49
+    jal x2, add1tohex
+    
+    li x7, 0b10101001111    # 101_0100_1111 + 1 = 101_0101_0000 (05:50)
+    li x8, 0b10101011001    # 101_0101_1001 = 05:59
+    jal x2, add1tohex
+    
+    li x7, 0b10111111111    # 101_1111_1111 + 1 = 110_0000_0000 (06:00)
+    li x8, 0b11000001001    # 110_0000_1001 = 06:09
+    jal x2, add1tohex
+    
+    li x7, 0b11000001111    # 110_0000_1111 + 1 = 110_0001_0000 (06:10)
+    li x8, 0b11000011001    # 110_0001_1001 = 06:19
+    jal x2, add1tohex
+    
+    li x7, 0b11000011111    # 110_0001_1111 + 1 = 110_0010_0000 (06:20)
+    li x8, 0b11000101001    # 110_0010_1001 = 06:29
+    jal x2, add1tohex
+    
+    li x7, 0b11000101111    # 110_0010_1111 + 1 = 110_0011_0000 (06:30)
+    li x8, 0b11000111001    # 110_0011_1001 = 06:39
+    jal x2, add1tohex
+    
+    li x7, 0b11000111111    # 110_0011_1111 + 1 = 110_0100_0000 (06:40)
+    li x8, 0b11001001001    # 110_0100_1001 = 06:49
+    jal x2, add1tohex
+    
+    li x7, 0b11001001111    # 110_0100_1111 + 1 = 110_0101_0000 (06:50)
+    li x8, 0b11001011001    # 110_0101_1001 = 06:59
+    jal x2, add1tohex
+    
+    li x7, 0b11011111111    # 110_1111_1111 + 1 = 111_0000_0000 (07:00)
+    li x8, 0b11100001001    # 111_0000_1001 = 07:09
+    jal x2, add1tohex
+    
+    li x7, 0b11100001111    # 111_0000_1111 + 1 = 111_0001_0000 (07:10)
+    li x8, 0b11100011001    # 111_0001_1001 = 07:19
+    jal x2, add1tohex
+    
+    li x7, 0b11100011111    # 111_0001_1111 + 1 = 111_0010_0000 (07:20)
+    li x8, 0b11100101001    # 111_0010_1001 = 07:29
+    jal x2, add1tohex
+    
+    li x7, 0b11100101111    # 111_0010_1111 + 1 = 111_0011_0000 (07:30)
+    li x8, 0b11100111001    # 111_0011_1001 = 07:39
+    jal x2, add1tohex
+    
+    li x7, 0b11100111111    # 111_0011_1111 + 1 = 111_0100_0000 (07:40)
+    li x8, 0b11101001001    # 111_0100_1001 = 07:49
+    jal x2, add1tohex
+    
+    li x7, 0b11101001111    # 111_0100_1111 + 1 = 111_0101_0000 (07:50)
+    li x8, 0b11101011001    # 111_0101_1001 = 07:59
+    jal x2, add1tohex
+    
+    li x7, 0b11111111111    # 111_1111_1111 + 1 = 1000_0000_0000 (08:00)
+    li x8, 0b100000001001   # 1000_0000_1001 = 08:09
+    jal x2, add1tohex
+    
+    li x7, 0b100000001111   # 1000_0000_1111 + 1 = 1000_0001_0000 (08:10)
+    li x8, 0b100000011001   # 1000_0001_1001 = 08:19
+    jal x2, add1tohex
+    
+    li x7, 0b100000011111   # 1000_0001_1111 + 1 = 1000_0010_0000 (08:20)
+    li x8, 0b100000101001   # 1000_0010_1001 = 08:29
+    jal x2, add1tohex
+    
+    li x7, 0b100000101111   # 1000_0010_1111 + 1 = 1000_0011_0000 (08:30)
+    li x8, 0b100000111001   # 1000_0011_1001 = 08:39
+    jal x2, add1tohex
+    
+    li x7, 0b100000111111   # 1000_0011_1111 + 1 = 1000_0100_0000 (08:40)
+    li x8, 0b100001001001   # 1000_0100_1001 = 08:49
+    jal x2, add1tohex
+    
+    li x7, 0b100001001111   # 1000_0100_1111 + 1 = 1000_0101_0000 (08:50)
+    li x8, 0b100001011001   # 1000_0101_1001 = 08:59
+    jal x2, add1tohex
+    
+    li x7, 0b100011111111   # 1000_1111_1111 + 1 = 1001_0000_0000 (09:00)
+    li x8, 0b100100001001   # 1001_0000_1001 = 09:09
+    jal x2, add1tohex
+    
+    li x7, 0b100100001111   # 1001_0000_1111 + 1 = 1001_0001_0000 (09:10)
+    li x8, 0b100100011001   # 1001_0001_1001 = 09:19
+    jal x2, add1tohex
+    
+    li x7, 0b100100011111   # 1001_0001_1111 + 1 = 1001_0010_0000 (09:20)
+    li x8, 0b100100101001   # 1001_0010_1001 = 09:29
+    jal x2, add1tohex
+    
+    li x7, 0b100100101111   # 1001_0010_1111 + 1 = 1001_0011_0000 (09:30)
+    li x8, 0b100100111001   # 1001_0011_1001 = 09:39
+    jal x2, add1tohex
+    
+    li x7, 0b100100111111   # 1001_0011_1111 + 1 = 1001_0100_0000 (09:40)
+    li x8, 0b100101001001   # 1001_0100_1001 = 09:49
+    jal x2, add1tohex
+    
+    li x7, 0b100101001111   # 1001_0100_1111 + 1 = 1001_0101_0000 (09:50)
+    li x8, 0b100101011001   # 1001_0101_1001 = 09:59
+    jal x2, add1tohex
+  
+    li x7, 0b1000000000000  # 0001_0000_0000_0000 (10:00)
+    sw x7, 0(x5)
+    jal x1, delay1s
+    jal x0, main_loop
+    
+# ---------------------------------
+# delay1s:
+# ---------------------------------
+delay1s:
+    li x3, 0
+    li x4, 0x3F940B   # ~1s @25MHz
+delay_loop:
+    jal x18, detectkey
+    addi x3, x3, 1
+    bne  x3, x4, delay_loop
+    jalr x0, x1, 0
+
+# ---------------------------------
+# add1to9tohexled:
+# ---------------------------------
+add1tohex:
+    addi x7, x7, 1
+    sw x7, 0(x5)
+    jal x1, delay1s
+    blt x7, x8, add1tohex
+    jalr x0, x2, 0
+    
+# ---------------------------------
+# detectkey:
+# ---------------------------------
+detectkey:
+    lw x9, 0(x6)
+    bne x9, x10, detectkey
+    jalr x0, x18, 0
