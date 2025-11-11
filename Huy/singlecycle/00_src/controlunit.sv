@@ -21,7 +21,8 @@ logic lb, lh, lw, lbu, lhu;																			                     // I_type(3)
 logic addi, slli, slti, sltiu, xori, srli, srai, ori, andi;									                     // I_type(19)
 logic auipc;																								                     // U_type(23)
 logic sb, sh, sw;														   								                     // S_type(35)
-logic add, sub, sll, slt, sltu, XOR, srl, sra, OR, AND, mul, mulh, mulhsu, mulhu, div, divu, rem, remu;	// R_type(51)
+logic add, sub, sll, slt, sltu, XOR, srl, sra, OR, AND; 
+//logic mul, mulh, mulhsu, mulhu, div, divu, rem, remu;		// R_type(51)
 logic lui;																									                     // U_type(55)
 logic beq, bne, blt, bge, bltu, bgeu;																                     // B_type(99)
 logic jalr;																									                     // I_type(103)
@@ -89,14 +90,14 @@ assign srl    = ~i_funct7_5 &  i_funct3[14] & ~i_funct3[13] &  i_funct3[12] & R_
 assign sra    =  i_funct7_5 &  i_funct3[14] & ~i_funct3[13] &  i_funct3[12] & R_type;		// funct3 = 101, funct7[30] = 1
 assign OR     = ~i_funct7_5 &  i_funct3[14] &  i_funct3[13] & ~i_funct3[12] & R_type;		// funct3 = 110, funct7[30] = 0
 assign AND    = ~i_funct7_5 &  i_funct3[14] &  i_funct3[13] &  i_funct3[12] & R_type;		// funct3 = 111, funct7[30] = 0
-assign mul    =  i_funct7_0 & ~i_funct3[14] & ~i_funct3[13] & ~i_funct3[12] & R_type;		// funct3 = 000, funct7[25] = 1
-assign mulh   =  i_funct7_0 & ~i_funct3[14] & ~i_funct3[13] &  i_funct3[12] & R_type;		// funct3 = 001, funct7[25] = 1
-assign mulhsu =  i_funct7_0 & ~i_funct3[14] &  i_funct3[13] & ~i_funct3[12] & R_type;		// funct3 = 010, funct7[25] = 1
-assign mulhu  =  i_funct7_0 & ~i_funct3[14] &  i_funct3[13] &  i_funct3[12] & R_type;		// funct3 = 011, funct7[25] = 1
-assign div    =  i_funct7_0 &  i_funct3[14] & ~i_funct3[13] & ~i_funct3[12] & R_type;		// funct3 = 100, funct7[25] = 1
-assign divu   =  i_funct7_0 &  i_funct3[14] & ~i_funct3[13] &  i_funct3[12] & R_type;		// funct3 = 101, funct7[25] = 1
-assign rem    =  i_funct7_0 &  i_funct3[14] &  i_funct3[13] & ~i_funct3[12] & R_type;		// funct3 = 110, funct7[25] = 1
-assign remu   =  i_funct7_0 &  i_funct3[14] &  i_funct3[13] &  i_funct3[12] & R_type;		// funct3 = 111, funct7[25] = 1
+//assign mul    =  i_funct7_0 & ~i_funct3[14] & ~i_funct3[13] & ~i_funct3[12] & R_type;		// funct3 = 000, funct7[25] = 1
+//assign mulh   =  i_funct7_0 & ~i_funct3[14] & ~i_funct3[13] &  i_funct3[12] & R_type;		// funct3 = 001, funct7[25] = 1
+//assign mulhsu =  i_funct7_0 & ~i_funct3[14] &  i_funct3[13] & ~i_funct3[12] & R_type;		// funct3 = 010, funct7[25] = 1
+//assign mulhu  =  i_funct7_0 & ~i_funct3[14] &  i_funct3[13] &  i_funct3[12] & R_type;		// funct3 = 011, funct7[25] = 1
+//assign div    =  i_funct7_0 &  i_funct3[14] & ~i_funct3[13] & ~i_funct3[12] & R_type;		// funct3 = 100, funct7[25] = 1
+//assign divu   =  i_funct7_0 &  i_funct3[14] & ~i_funct3[13] &  i_funct3[12] & R_type;		// funct3 = 101, funct7[25] = 1
+//assign rem    =  i_funct7_0 &  i_funct3[14] &  i_funct3[13] & ~i_funct3[12] & R_type;		// funct3 = 110, funct7[25] = 1
+//assign remu   =  i_funct7_0 &  i_funct3[14] &  i_funct3[13] &  i_funct3[12] & R_type;		// funct3 = 111, funct7[25] = 1
 
 // U_type(55)
 assign lui   = U_type_55;
@@ -199,7 +200,9 @@ always_comb begin
 			o_alu_op = 5'b00101; o_insn_vld = 1;	
 		end else if (AND) begin  
 			o_alu_op = 5'b00110; o_insn_vld = 1;
-		end else if (mul) begin  
+		end 
+/*		
+		else if (mul) begin  
 			o_alu_op = 5'b01011; o_insn_vld = 1;
 		end else if (mulh) begin  
 			o_alu_op = 5'b01100; o_insn_vld = 1;
@@ -216,6 +219,7 @@ always_comb begin
 		end else if (remu) begin  
 			o_alu_op = 5'b10010; o_insn_vld = 1;
 		end
+*/
 	end
 	
 	else if (lui) begin
