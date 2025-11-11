@@ -345,7 +345,7 @@ main_loop:
 # ---------------------------------
 delay1s:
     li x3, 0
-    li x4, 0x3F940B   # ~1s @25MHz
+    li x4, 0xA26D   # ~10ms @25MHz
 delay_loop:
     jal x18, detectkey
     addi x3, x3, 1
@@ -361,6 +361,7 @@ add1tohex:
     sw x8, 0(x5)
     jal x1, delay1s
     blt x7, x13, add1tohex
+    li x7, -1
     jalr x0, x2, 0
     
 # ---------------------------------
