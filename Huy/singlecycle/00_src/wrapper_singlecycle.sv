@@ -16,19 +16,13 @@ module wrapper_singlecycle (
 );
 
 logic clk;
-logic pll_locked;
-logic global_reset;
 
-assign global_reset = (~KEY[3]) | (~pll_locked);
+PLL25MHz pll25mhz (.refclk(CLOCK_50), .rst(~KEY[2]), .outclk_0(clk));
 
-//clock_25M clk25m (.clk50(CLOCK_50), .i_reset(KEY[3]), .o_clk(clk));
-PLL25MHz pll25mhz (.refclk(CLOCK_50), .rst(global_reset), .outclk_0(clk), .locked(pll_locked));
-
-single_cycle singlecycle1 (.i_clk(clk), .i_reset(KEY[3]), .i_io_sw({22'b0, SW[9:0]}), .i_io_key({29'b0, KEY[2:0]}),
+single_cycle singlecycle1 (.i_clk(clk), .i_reset(KEY[3]), .i_io_sw({22'b0, SW[9:0]}), .i_io_key({30'b0, KEY[1:0]}),
 								   .o_pc_debug(o_pc_debug), .o_insn_vld(o_insn_vld), .o_io_ledr(LEDR), .o_io_ledg(o_io_ledg),
 								   .o_io_hex0(HEX0), .o_io_hex1(HEX1), .o_io_hex2(HEX2), .o_io_hex3(HEX3),
 								   .o_io_hex4(HEX4), .o_io_hex5(HEX5), .o_io_hex6(o_io_hex6), .o_io_hex7(o_io_hex7), 
 								   .o_io_lcd(GPIO));
-
 
 endmodule

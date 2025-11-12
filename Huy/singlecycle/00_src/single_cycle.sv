@@ -2,7 +2,7 @@ module single_cycle (
 	input logic         i_clk, 		// Global clock, active on the rising edge.
 	input logic         i_reset,		// Global low active reset.
 	input logic  [31:0] i_io_sw,		// Input for switches.
-	input logic  [3:0]  i_io_key,		// Input for keys.
+	input logic  [1:0]  i_io_key,		// Input for keys.
 	
 	output logic [31:0] o_pc_debug,	// Debug program counter.
 	output logic        o_insn_vld,	// Instruction valid.

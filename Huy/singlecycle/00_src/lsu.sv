@@ -6,7 +6,7 @@ module lsu (
 	input logic         i_lsu_wren, 											 // Write enable signal (1 if writing)
 	input logic  [31:0] i_io_sw, 												 // Input for switches
 	input logic  [2:0]  i_bmask, 											    // check store type
-	input logic  [3:0]  i_io_key, 											 // Input for keys
+	input logic  [1:0]  i_io_key, 											 // Input for keys
 	
 	output logic [31:0] o_ld_data, 											 // Data read from memory
 	output logic [31:0] o_io_ledr, 											 // Output for red LEDs
@@ -95,7 +95,7 @@ always_comb begin
    end else if (addr_is_sw) begin
 		o_ld_data = i_io_sw;
 	end else if (addr_is_key) begin
-		o_ld_data = {28'b0, i_io_key};
+		o_ld_data = {30'b0, i_io_key};
    end else if (addr_is_ledr) begin
       o_ld_data = {15'b0, o_io_ledr[16:0]};
    end else if (addr_is_ledg) begin
