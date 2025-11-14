@@ -22,6 +22,7 @@ module lsu (
 //     | |  | |  __/ | | | | | (_) | |  | |_| | | |  | | (_| | |_) |
 //     |_|  |_|\___|_| |_| |_|\___/|_|   \__, | |_|  |_|\__,_| .__/ 
 //                                       |___/               |_|   
+/*
 localparam ADDR_MEM_BASE   = 32'h0000_0000; // D$ (Data Memory)
 localparam ADDR_MEM_TOP    = 32'h0000_07FF; 
 
@@ -45,6 +46,7 @@ localparam ADDR_SW_TOP     = 32'h1001_0FFF;
 
 localparam ADDR_KEY_BASE   = 32'h1000_5000; // Input Buffer (Keys)
 localparam ADDR_KEY_TOP    = 32'h1000_5FFF;
+*/
 
 //         _       _     _                     ____                     _           
 //        / \   __| | __| |_ __ ___  ___ ___  |  _ \  ___  ___ ___   __| | ___ _ __ 
@@ -61,14 +63,53 @@ logic addr_is_lcd;
 logic addr_is_sw;
 logic addr_is_key;
 
-assign addr_is_mem   = (i_lsu_addr >= ADDR_MEM_BASE)   && (i_lsu_addr <= ADDR_MEM_TOP);
-assign addr_is_ledr  = (i_lsu_addr >= ADDR_LEDR_BASE)  && (i_lsu_addr <= ADDR_LEDR_TOP);
-assign addr_is_ledg  = (i_lsu_addr >= ADDR_LEDG_BASE)  && (i_lsu_addr <= ADDR_LEDG_TOP);
-assign addr_is_hex03 = (i_lsu_addr >= ADDR_HEX03_BASE) && (i_lsu_addr <= ADDR_HEX03_TOP);
-assign addr_is_hex47 = (i_lsu_addr >= ADDR_HEX47_BASE) && (i_lsu_addr <= ADDR_HEX47_TOP);
-assign addr_is_lcd   = (i_lsu_addr >= ADDR_LCD_BASE)   && (i_lsu_addr <= ADDR_LCD_TOP);
-assign addr_is_sw    = (i_lsu_addr >= ADDR_SW_BASE)    && (i_lsu_addr <= ADDR_SW_TOP);
-assign addr_is_key   = (i_lsu_addr >= ADDR_KEY_BASE)   && (i_lsu_addr <= ADDR_KEY_TOP);
+assign addr_is_mem   = ~i_lsu_addr[31] & ~i_lsu_addr[30] & ~i_lsu_addr[29] & ~i_lsu_addr[28] &
+							  ~i_lsu_addr[27] & ~i_lsu_addr[26] & ~i_lsu_addr[25] & ~i_lsu_addr[24] & 
+							  ~i_lsu_addr[23] & ~i_lsu_addr[22] & ~i_lsu_addr[21] & ~i_lsu_addr[20] & 
+							  ~i_lsu_addr[19] & ~i_lsu_addr[18] & ~i_lsu_addr[17] & ~i_lsu_addr[16] & 
+							  ~i_lsu_addr[15] & ~i_lsu_addr[14] & ~i_lsu_addr[13] & ~i_lsu_addr[12] & ~i_lsu_addr[11];
+							  
+assign addr_is_ledr  = ~i_lsu_addr[31] & ~i_lsu_addr[30] & ~i_lsu_addr[29] &  i_lsu_addr[28] &
+							  ~i_lsu_addr[27] & ~i_lsu_addr[26] & ~i_lsu_addr[25] & ~i_lsu_addr[24] & 
+							  ~i_lsu_addr[23] & ~i_lsu_addr[22] & ~i_lsu_addr[21] & ~i_lsu_addr[20] & 
+							  ~i_lsu_addr[19] & ~i_lsu_addr[18] & ~i_lsu_addr[17] & ~i_lsu_addr[16] & 
+							  ~i_lsu_addr[15] & ~i_lsu_addr[14] & ~i_lsu_addr[13] & ~i_lsu_addr[12];
+							  
+assign addr_is_ledg  = ~i_lsu_addr[31] & ~i_lsu_addr[30] & ~i_lsu_addr[29] &  i_lsu_addr[28] &
+							  ~i_lsu_addr[27] & ~i_lsu_addr[26] & ~i_lsu_addr[25] & ~i_lsu_addr[24] & 
+							  ~i_lsu_addr[23] & ~i_lsu_addr[22] & ~i_lsu_addr[21] & ~i_lsu_addr[20] & 
+							  ~i_lsu_addr[19] & ~i_lsu_addr[18] & ~i_lsu_addr[17] & ~i_lsu_addr[16] & 
+							  ~i_lsu_addr[15] & ~i_lsu_addr[14] & ~i_lsu_addr[13] &  i_lsu_addr[12];
+							  
+assign addr_is_hex03 = ~i_lsu_addr[31] & ~i_lsu_addr[30] & ~i_lsu_addr[29] &  i_lsu_addr[28] &
+							  ~i_lsu_addr[27] & ~i_lsu_addr[26] & ~i_lsu_addr[25] & ~i_lsu_addr[24] & 
+							  ~i_lsu_addr[23] & ~i_lsu_addr[22] & ~i_lsu_addr[21] & ~i_lsu_addr[20] & 
+							  ~i_lsu_addr[19] & ~i_lsu_addr[18] & ~i_lsu_addr[17] & ~i_lsu_addr[16] & 
+							  ~i_lsu_addr[15] & ~i_lsu_addr[14] &  i_lsu_addr[13] & ~i_lsu_addr[12];
+							  
+assign addr_is_hex47 = ~i_lsu_addr[31] & ~i_lsu_addr[30] & ~i_lsu_addr[29] &  i_lsu_addr[28] &
+							  ~i_lsu_addr[27] & ~i_lsu_addr[26] & ~i_lsu_addr[25] & ~i_lsu_addr[24] & 
+							  ~i_lsu_addr[23] & ~i_lsu_addr[22] & ~i_lsu_addr[21] & ~i_lsu_addr[20] & 
+							  ~i_lsu_addr[19] & ~i_lsu_addr[18] & ~i_lsu_addr[17] & ~i_lsu_addr[16] & 
+							  ~i_lsu_addr[15] & ~i_lsu_addr[14] &  i_lsu_addr[13] &  i_lsu_addr[12];
+							  
+assign addr_is_lcd   = ~i_lsu_addr[31] & ~i_lsu_addr[30] & ~i_lsu_addr[29] &  i_lsu_addr[28] &
+							  ~i_lsu_addr[27] & ~i_lsu_addr[26] & ~i_lsu_addr[25] & ~i_lsu_addr[24] & 
+							  ~i_lsu_addr[23] & ~i_lsu_addr[22] & ~i_lsu_addr[21] & ~i_lsu_addr[20] & 
+							  ~i_lsu_addr[19] & ~i_lsu_addr[18] & ~i_lsu_addr[17] & ~i_lsu_addr[16] & 
+							  ~i_lsu_addr[15] &  i_lsu_addr[14] & ~i_lsu_addr[13] & ~i_lsu_addr[12];
+							  
+assign addr_is_sw    = ~i_lsu_addr[31] & ~i_lsu_addr[30] & ~i_lsu_addr[29] &  i_lsu_addr[28] &
+							  ~i_lsu_addr[27] & ~i_lsu_addr[26] & ~i_lsu_addr[25] & ~i_lsu_addr[24] & 
+							  ~i_lsu_addr[23] & ~i_lsu_addr[22] & ~i_lsu_addr[21] & ~i_lsu_addr[20] & 
+							  ~i_lsu_addr[19] & ~i_lsu_addr[18] & ~i_lsu_addr[17] &  i_lsu_addr[16] & 
+							  ~i_lsu_addr[15] & ~i_lsu_addr[14] & ~i_lsu_addr[13] & ~i_lsu_addr[12];
+							  
+assign addr_is_key   = ~i_lsu_addr[31] & ~i_lsu_addr[30] & ~i_lsu_addr[29] &  i_lsu_addr[28] &
+							  ~i_lsu_addr[27] & ~i_lsu_addr[26] & ~i_lsu_addr[25] & ~i_lsu_addr[24] & 
+							  ~i_lsu_addr[23] & ~i_lsu_addr[22] & ~i_lsu_addr[21] & ~i_lsu_addr[20] & 
+							  ~i_lsu_addr[19] & ~i_lsu_addr[18] & ~i_lsu_addr[17] & ~i_lsu_addr[16] & 
+							  ~i_lsu_addr[15] &  i_lsu_addr[14] & ~i_lsu_addr[13] &  i_lsu_addr[12];
 
 logic [9:0] addr_even_1, addr_even_2, addr_odd_1, addr_odd_2;
 logic [7:0] data_even_1, data_even_2, data_odd_1, data_odd_2;
@@ -88,7 +129,7 @@ memory mem (.i_clk(i_clk), .i_addr_even_1(addr_even_1), .i_addr_even_2(addr_even
 							      .i_we_even_1(we_even_1),     .i_we_even_2(we_even_2),     .i_we_odd_1(we_odd_1),     .i_we_odd_2(we_odd_2),
 				.o_data(mem_ld_data), .i_lsu_addr(i_lsu_addr[0]));			
 
-always_comb begin
+always @(*) begin
 	o_ld_data = 32'h0; 
 	if (addr_is_mem) begin
 		o_ld_data = mem_ld_data;
