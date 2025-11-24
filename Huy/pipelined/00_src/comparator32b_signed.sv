@@ -8,7 +8,7 @@ logic Eq_u, Gr_u, Lt_u;
 
 comparator32b cmp_unsigned (.a(a), .b(b), .Eq(Eq_u), .Gr(Gr_u), .Lt(Lt_u));
 
-always @(*) begin
+always_comb begin
     if (signed_mode) begin
 		if (a[31] != b[31]) begin
 			Eq = 1'b0;
@@ -76,6 +76,5 @@ module comparator2b (
 assign Gr = (a[0] & ~b[1] & ~b[0]) | (a[1] & ~b[1]) | (a[1] & a[0] & ~b[0]);
 assign Lt = (~a[1] & ~a[0] & b[0]) | (~a[1] & b[1]) | (~a[0] & b[1] & b[0]);
 assign Eq = (~a[1] & ~a[0] & ~b[1] & ~b[0]) | (~a[1] & a[0] & ~b[1] & b[0]) | (a[1] & ~a[0] & b[1] & ~b[0]) | (a[1] & a[0] & b[1] & b[0]);
-
 
 endmodule

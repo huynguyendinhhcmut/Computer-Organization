@@ -4,7 +4,7 @@ module immgen (
 	output logic [31:0] o_immext
 );
 
-	always @(*) begin
+always_comb begin
     case (i_imm_sel)
 		3'b000: o_immext = {{20{i_instr[31]}}, i_instr[31:20]};													// I Type
 		3'b001: o_immext = {{20{i_instr[31]}}, i_instr[31:25], i_instr[11:7]};								// S Type
@@ -16,4 +16,3 @@ module immgen (
 end
 
 endmodule
-
