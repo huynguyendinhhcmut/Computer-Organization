@@ -61,14 +61,13 @@ hazard hazard1 (.i_rs1_addr_decode(instr_decode[19:15]), .i_rs2_addr_decode(inst
 //                             
 
 logic [31:0] pc_fetch, pc_four, pc_next;
-logic [31:0] instr_fetch;
-logic clock_stall_fetch;
+logic [31:0] instr_decode;
 
-assign clock_stall_fetch = i_clk & ~stall_fetch;
-
-always_ff @(posedge clock_stall_fetch or negedge i_reset) begin
+always_ff @(posedge i_clk or negedge i_reset) begin
 	if (~i_reset)
 		pc_fetch <= 32'b0;
+	else if (stall_fetch)
+		pc_fetch <= pc_fetch;
 	else 
 		pc_fetch <= pc_next;
 end
@@ -82,7 +81,7 @@ end
 		
 fullAdder32b pcfour (.a(pc_fetch), .b(32'h4), .cin(1'b0), .sum(pc_four)); // pc_four
 
-instrmem instr_mem (.i_clk(i_clk), .i_reset(i_reset), .i_pc(pc_fetch), .o_instr(instr_fetch)); // instruction memory
+instrmem instr_mem (.i_clk(i_clk), .i_reset(i_reset), .i_pc(pc_fetch), .o_instr(instr_decode)); // instruction memory
 
 //      ____                     _      
 //     |  _ \  ___  ___ ___   __| | ___ 
@@ -91,7 +90,7 @@ instrmem instr_mem (.i_clk(i_clk), .i_reset(i_reset), .i_pc(pc_fetch), .o_instr(
 //     |____/ \___|\___\___/ \__,_|\___|
 //                                      
 
-logic [31:0] pc_decode, instr_decode;
+logic [31:0] pc_decode;
 logic [2:0] br_sel_decode;
 logic pc_jump_sel_decode, rd_wren_decode;
 logic [2:0] imm_sel_decode;
@@ -104,9 +103,9 @@ logic [31:0] immext_decode, rs1_data_decode, rs2_data_decode;
 
 flip_flop_fetch_decode ffIFID (.i_clk(i_clk),                 .i_reset(i_reset), 
 										 .i_stall_decode(stall_decode), .i_flush_decode(flush_decode),
-										 .i_pc_fetch(pc_fetch),         .i_instr_fetch(instr_fetch),
+										 .i_pc_fetch(pc_fetch), 
 	 
-										 .o_pc_decode(pc_decode),       .o_instr_decode(instr_decode));
+										 .o_pc_decode(pc_decode));
 
 controlunit ctrlunit (.i_op(instr_decode[6:0]),      .i_funct3(instr_decode[14:12]),
 							 .i_funct7_5(instr_decode[30]), .i_funct7_0(instr_decode[25]),
@@ -119,7 +118,7 @@ controlunit ctrlunit (.i_op(instr_decode[6:0]),      .i_funct3(instr_decode[14:1
 							 .o_wb_sel(wb_sel_decode),      .o_sl_sel(sl_sel_decode),
 	                   .o_bmask(bmask_decode));											
 
-immgen imm_gen (.i_instr(instr_decode[31:0]), .i_imm_sel(imm_sel_decode), 
+immgen imm_gen (.i_instr(instr_decode[31:7]), .i_imm_sel(imm_sel_decode), 
 
 					 .o_immext(immext_decode));
 							 
@@ -141,7 +140,7 @@ logic [31:0] alu_data_execute;
 logic [31:0] pc_execute, pc_four_execute;
 logic [4:0] rs1_addr_execute, rs2_addr_execute, rd_addr_execute;
 logic [2:0] br_sel_execute;
-logic pc_jump_sel_excute, rd_wren_execute, insn_vld_execute, br_un_execute;
+logic pc_jump_sel_execute, rd_wren_execute, insn_vld_execute, br_un_execute;
 logic opa_sel_execute, opb_sel_execute;
 logic [4:0] alu_op_execute;
 logic mem_wren_execute;
@@ -149,9 +148,9 @@ logic [1:0] wb_sel_execute;
 logic [2:0] sl_sel_execute, bmask_execute;
 logic [31:0] immext_execute, rs1_data_execute, rs2_data_execute;
 logic [31:0] pre_opa_execute, pre_opb_execute, operand_a_execute, operand_b_execute;
-logic pc_br_sel_excute;
+logic pc_br_sel_execute;
 
-assign pc_sel = pc_br_sel_excute | pc_jump_sel_excute;
+assign pc_sel = pc_br_sel_execute | pc_jump_sel_execute;
 
 flip_flop_decode_execute ffIDEX (.i_clk(i_clk),                             .i_reset(i_reset), 
 											.i_flush_execute(flush_execute),           .i_pc_decode(pc_decode), 
@@ -166,7 +165,7 @@ flip_flop_decode_execute ffIDEX (.i_clk(i_clk),                             .i_r
 	
 											.o_pc_execute(pc_execute),                 .o_rs1_addr_execute(rs1_addr_execute), 
 											.o_rs2_addr_execute(rs2_addr_execute),     .o_rd_addr_execute(rd_addr_execute),
-											.o_br_sel_execute(br_sel_execute),         .o_pc_jump_sel_excute(pc_jump_sel_excute), 
+											.o_br_sel_execute(br_sel_execute),         .o_pc_jump_sel_execute(pc_jump_sel_execute), 
 											.o_rd_wren_execute(rd_wren_execute),       .o_insn_vld_execute(insn_vld_execute), 
 											.o_br_un_execute(br_un_execute),           .o_opa_sel_execute(opa_sel_execute), 
 											.o_opb_sel_execute(opb_sel_execute),       .o_alu_op_execute(alu_op_execute),
@@ -209,7 +208,7 @@ alu alu1 (.i_operand_a(operand_a_execute), .i_operand_b(operand_b_execute),
 brc brc1 (.i_rs1_data(pre_opa_execute), .i_rs2_data(pre_opb_execute), 
 			 .i_br_un(br_un_execute),      .i_br_sel(br_sel_execute), 
 			 
-			 .o_pc_sel(pc_br_sel_excute));
+			 .o_pc_sel(pc_br_sel_execute));
 
 fullAdder32b pcfourexecute (.a(pc_execute), .b(32'h4), .cin(1'b0), .sum(pc_four_execute)); // pc_four_execute
 

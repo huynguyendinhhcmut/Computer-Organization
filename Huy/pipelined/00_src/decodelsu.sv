@@ -20,7 +20,7 @@ assign next_addr_odd1 = i_lsu_addr[9:0] & 10'h3fe;														       // odd1  
 fullAdder10b map_addr_even2 (.a(next_addr_even1), .b(10'h1), .cin(1'b0), .sum(next_addr_even2)); // even2 = addr + 3
 fullAdder10b map_addr_odd2  (.a(next_addr_odd1 ), .b(10'h2), .cin(1'b0), .sum(next_addr_odd2 )); // odd2  = addr + 1
 
-always_comb begin
+always @(*) begin
 	if (~i_lsu_addr[0]) begin
 		mapped_addr_even_1 = i_lsu_addr[10:1];
 		mapped_addr_odd_1  = i_lsu_addr[10:1];
@@ -34,7 +34,7 @@ always_comb begin
 	end
 end
 
-always_comb begin
+always @(*) begin
 
 	o_addr_even_1 = mapped_addr_even_1;
 	o_data_even_1 = 8'b0; 

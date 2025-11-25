@@ -4,10 +4,10 @@ module instrmem (
    output logic [31:0] o_instr
 );
 
-logic [31:0] memory [0:2047];   
+logic [31:0] memory [0:16383];   
 	
 initial begin
-   $readmemh("program.txt", memory);
+   $readmemh("/home/nguyendinhhuy/rtl/pipelined/rtl/program.txt", memory);
 end
 
 always @(posedge i_clk or negedge i_reset) begin
