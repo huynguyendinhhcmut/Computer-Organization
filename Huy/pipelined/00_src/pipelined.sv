@@ -21,6 +21,8 @@ module pipelined (
 	output logic [31:0] o_io_lcd	   // Output for driving the LCD register.
 );
 
+assign o_mispred = flush_decode | flush_execute;
+
 logic pc_sel;
 
 //      _   _                        _   ____       _            _   _             
