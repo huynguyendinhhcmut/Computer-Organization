@@ -1,7 +1,7 @@
 module memory (
 	input logic i_clk,
 	input logic i_lsu_addr,
-	input logic [14:0] i_addr_even_1, i_addr_even_2, i_addr_odd_1, i_addr_odd_2,
+	input logic [9:0] i_addr_even_1, i_addr_even_2, i_addr_odd_1, i_addr_odd_2,
 	input logic [7:0] i_data_even_1, i_data_even_2, i_data_odd_1, i_data_odd_2,
 	input logic i_we_even_1, i_we_even_2, i_we_odd_1, i_we_odd_2,
 	output logic [31:0] o_data

@@ -122,7 +122,7 @@ assign jal 	 = J_type;
 //     |___|_| |_|___/\__|_|   \__,_|\___|\__|_|\___/|_| |_|___/ |____/ \___|\___\___/ \__,_|\___|_|   
 // 
                                                                                                     					  
-always_comb begin
+always @(*) begin
 	o_pc_sel  = 0; o_rd_wren = 0;        o_imm_sel  = 3'b000; o_insn_vld = 0;     o_br_un    = 0; o_opa_sel = 0; o_br_sel = 3'b000;
 	o_opb_sel = 0; o_alu_op  = 5'b00000; o_mem_wren = 0;      o_wb_sel   = 2'b00; o_sl_sel  = 3'b000;
 		

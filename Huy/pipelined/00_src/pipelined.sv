@@ -21,8 +21,6 @@ module pipelined (
 	output logic [31:0] o_io_lcd	   // Output for driving the LCD register.
 );
 
-assign o_mispred = flush_decode | flush_execute;
-
 logic pc_sel;
 
 //      _   _                        _   ____       _            _   _             
@@ -83,7 +81,11 @@ end
 		
 fullAdder32b pcfour (.a(pc_fetch), .b(32'h4), .cin(1'b0), .sum(pc_four)); // pc_four
 
-instrmem instr_mem (.i_clk(i_clk), .i_reset(i_reset), .i_pc(pc_fetch), .o_instr(instr_decode)); // instruction memory
+instrmem instr_mem (.i_clk(i_clk), 		   .i_reset(i_reset), 
+		    .i_stall_decode(stall_decode), .i_flush_decode(flush_decode), 
+		    .i_pc(pc_fetch), 
+		    
+		    .o_instr(instr_decode)); // instruction memory
 
 //      ____                     _      
 //     |  _ \  ___  ___ ___   __| | ___ 
@@ -225,7 +227,7 @@ logic [31:0] alu_pc4_data_memory, pc_memory, pc_four_memory;
 logic rd_wren_memory, insn_vld_memory, mem_wren_memory;
 logic [1:0] wb_sel_memory;
 logic [2:0] sl_sel_memory, bmask_memory;
-logic [31:0] alu_data_memory, rs2_data_memory;
+logic [31:0] alu_data_memory, pre_opb_memory;
 logic [4:0] rd_addr_memory;
 logic [31:0] io_sw;
 logic [1:0] io_key;
@@ -237,14 +239,14 @@ flip_flop_execute_memory ffEXMEM (.i_clk(i_clk),                         .i_rese
 											 .i_mem_wren_execute(mem_wren_execute), .i_wb_sel_execute(wb_sel_execute),
 											 .i_sl_sel_execute(sl_sel_execute),     .i_bmask_execute(bmask_execute),
 											 .i_alu_data_execute(alu_data_execute), .i_rd_addr_execute(rd_addr_execute),
-											 .i_rs2_data_execute(rs2_data_execute),
+											 .i_pre_opb_execute(pre_opb_execute),
 	
 											 .o_pc_memory(pc_memory),               .o_pc_four_memory(pc_four_memory),
 											 .o_rd_wren_memory(rd_wren_memory),     .o_insn_vld_memory(insn_vld_memory), 
 											 .o_mem_wren_memory(mem_wren_memory),   .o_wb_sel_memory(wb_sel_memory),
 											 .o_sl_sel_memory(sl_sel_memory),       .o_bmask_memory(bmask_memory),
 											 .o_alu_data_memory(alu_data_memory),   .o_rd_addr_memory(rd_addr_memory),
-											 .o_rs2_data_memory(rs2_data_memory));
+											 .o_pre_opb_memory(pre_opb_memory));
 
 always_ff @(posedge i_clk or negedge i_reset) begin
 	if (~i_reset) 
@@ -268,7 +270,7 @@ always @(*) begin
 end
 
 lsu lsu1 (.i_clk(i_clk),                .i_reset(i_reset), 
-          .i_lsu_addr(alu_data_memory), .i_st_data(rs2_data_memory), 
+          .i_lsu_addr(alu_data_memory), .i_st_data(pre_opb_memory), 
 			 .i_lsu_wren(mem_wren_memory), .i_sl_sel(sl_sel_memory),
 			 .i_io_sw(io_sw),              .i_bmask(bmask_memory), 
 			 .i_io_key(io_key),

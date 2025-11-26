@@ -11,22 +11,53 @@ module hazard (
 	output logic o_flush_execute
 );
 
+logic rdMEM_rs1EX, rdMEM_rs2EX, rdWB_rs1EX, rdWB_rs2EX;
+
+assign rdMEM_rs1EX = (~(i_rd_addr_memory[4] ^ i_rs1_addr_execute[4])) &
+		     (~(i_rd_addr_memory[3] ^ i_rs1_addr_execute[3])) &
+		     (~(i_rd_addr_memory[2] ^ i_rs1_addr_execute[2])) &
+		     (~(i_rd_addr_memory[1] ^ i_rs1_addr_execute[1])) &
+		     (~(i_rd_addr_memory[0] ^ i_rs1_addr_execute[0]));
+		     
+assign rdMEM_rs2EX = (~(i_rd_addr_memory[4] ^ i_rs2_addr_execute[4])) &
+		     (~(i_rd_addr_memory[3] ^ i_rs2_addr_execute[3])) &
+		     (~(i_rd_addr_memory[2] ^ i_rs2_addr_execute[2])) &
+		     (~(i_rd_addr_memory[1] ^ i_rs2_addr_execute[1])) &
+		     (~(i_rd_addr_memory[0] ^ i_rs2_addr_execute[0]));
+		    
+assign rdWB_rs1EX  = (~(i_rd_addr_writeback[4] ^ i_rs1_addr_execute[4])) &
+		     (~(i_rd_addr_writeback[3] ^ i_rs1_addr_execute[3])) &
+		     (~(i_rd_addr_writeback[2] ^ i_rs1_addr_execute[2])) &
+		     (~(i_rd_addr_writeback[1] ^ i_rs1_addr_execute[1])) &
+		     (~(i_rd_addr_writeback[0] ^ i_rs1_addr_execute[0]));
+		 
+assign rdWB_rs2EX  = (~(i_rd_addr_writeback[4] ^ i_rs2_addr_execute[4])) &
+		     (~(i_rd_addr_writeback[3] ^ i_rs2_addr_execute[3])) &
+		     (~(i_rd_addr_writeback[2] ^ i_rs2_addr_execute[2])) &
+		     (~(i_rd_addr_writeback[1] ^ i_rs2_addr_execute[1])) &
+		     (~(i_rd_addr_writeback[0] ^ i_rs2_addr_execute[0]));
+
 always @(*) begin
 
 	o_foward_a_execution = 2'b00;
+	
+	if (&(~i_rs1_addr_execute))
+		o_foward_a_execution = 2'b00;
+	if (rdMEM_rs1EX) 
+		o_foward_a_execution = 2'b01;
+	if (rdWB_rs1EX) 
+		o_foward_a_execution = 2'b10;
+end
+
+always @(*) begin
+
 	o_foward_b_execution = 2'b00;
 	
-	if (~&i_rs1_addr_execute)
-		o_foward_a_execution = 2'b00;
-	else if (~&i_rs2_addr_execute)
+	if (&(~i_rs2_addr_execute))
 		o_foward_b_execution = 2'b00;
-	else if (~(i_rd_addr_memory ^ i_rs1_addr_execute)) 
-		o_foward_a_execution = 2'b01;
-	else if (~(i_rd_addr_memory ^ i_rs2_addr_execute))
+	if (rdMEM_rs2EX)
 		o_foward_b_execution = 2'b01;
-	else if (~(i_rd_addr_writeback ^ i_rs1_addr_execute)) 
-		o_foward_a_execution = 2'b10;
-	else if (~(i_rd_addr_writeback ^ i_rs2_addr_execute)) 
+	if (rdWB_rs2EX) 
 		o_foward_b_execution = 2'b10;
 end
 
