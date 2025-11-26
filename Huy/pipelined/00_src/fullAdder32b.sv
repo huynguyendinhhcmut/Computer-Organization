@@ -187,3 +187,4 @@ fullAdder fa64 (.sum(sum[63]), .a(a[63]), .b(b[63]^cin), .cin(carry[62]), .cout(
 xor (cout, carry[63], cin);
 
 endmodule
+

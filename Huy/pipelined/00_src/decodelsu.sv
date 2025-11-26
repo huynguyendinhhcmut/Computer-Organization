@@ -15,7 +15,7 @@ logic [3:0] check;
 
 assign check = {i_bmask, i_lsu_wren};
 
-fullAdder15b map_addr_even1 (.a(i_lsu_addr[9:0]), .b(15'h2), .cin(1'b0), .sum(next_addr_even1)); // even1 = addr + 2
+fullAdder15b map_addr_even1 (.a(i_lsu_addr[14:0]), .b(15'h2), .cin(1'b0), .sum(next_addr_even1)); // even1 = addr + 2
 assign next_addr_odd1 = i_lsu_addr[14:0] & 15'h7ffe;														    // odd1  = addr - 1
 fullAdder15b map_addr_even2 (.a(next_addr_even1), .b(15'h1), .cin(1'b0), .sum(next_addr_even2)); // even2 = addr + 3
 fullAdder15b map_addr_odd2  (.a(next_addr_odd1 ), .b(15'h2), .cin(1'b0), .sum(next_addr_odd2 )); // odd2  = addr + 1
@@ -118,3 +118,4 @@ always @(*) begin
 end
 
 endmodule
+

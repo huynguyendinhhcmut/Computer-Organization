@@ -43,9 +43,9 @@ always @(*) begin
 	
 	if (&(~i_rs1_addr_execute))
 		o_foward_a_execution = 2'b00;
-	if (rdMEM_rs1EX) 
+	else if (rdMEM_rs1EX) 
 		o_foward_a_execution = 2'b01;
-	if (rdWB_rs1EX) 
+	else if (rdWB_rs1EX) 
 		o_foward_a_execution = 2'b10;
 end
 
@@ -55,9 +55,9 @@ always @(*) begin
 	
 	if (&(~i_rs2_addr_execute))
 		o_foward_b_execution = 2'b00;
-	if (rdMEM_rs2EX)
+	else if (rdMEM_rs2EX)
 		o_foward_b_execution = 2'b01;
-	if (rdWB_rs2EX) 
+	else if (rdWB_rs2EX) 
 		o_foward_b_execution = 2'b10;
 end
 
