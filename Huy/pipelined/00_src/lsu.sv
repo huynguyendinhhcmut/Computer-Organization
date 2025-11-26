@@ -24,7 +24,7 @@ module lsu (
 //                                       |___/               |_|   
 /*
 localparam ADDR_MEM_BASE   = 32'h0000_0000; // D$ (Data Memory)
-localparam ADDR_MEM_TOP    = 32'h0000_07FF; 
+localparam ADDR_MEM_TOP    = 32'h0000_FFFF; 
 
 localparam ADDR_LEDR_BASE  = 32'h1000_0000; // Output Buffer (Red LEDs)
 localparam ADDR_LEDR_TOP   = 32'h1000_0FFF;
@@ -66,8 +66,7 @@ logic addr_is_key;
 assign addr_is_mem   = ~i_lsu_addr[31] & ~i_lsu_addr[30] & ~i_lsu_addr[29] & ~i_lsu_addr[28] &
 							  ~i_lsu_addr[27] & ~i_lsu_addr[26] & ~i_lsu_addr[25] & ~i_lsu_addr[24] & 
 							  ~i_lsu_addr[23] & ~i_lsu_addr[22] & ~i_lsu_addr[21] & ~i_lsu_addr[20] & 
-							  ~i_lsu_addr[19] & ~i_lsu_addr[18] & ~i_lsu_addr[17] & ~i_lsu_addr[16] & 
-							  ~i_lsu_addr[15] & ~i_lsu_addr[14] & ~i_lsu_addr[13] & ~i_lsu_addr[12] & ~i_lsu_addr[11];
+							  ~i_lsu_addr[19] & ~i_lsu_addr[18] & ~i_lsu_addr[17] & ~i_lsu_addr[16];
 							  
 assign addr_is_ledr  = ~i_lsu_addr[31] & ~i_lsu_addr[30] & ~i_lsu_addr[29] &  i_lsu_addr[28] &
 							  ~i_lsu_addr[27] & ~i_lsu_addr[26] & ~i_lsu_addr[25] & ~i_lsu_addr[24] & 
@@ -111,7 +110,7 @@ assign addr_is_key   = ~i_lsu_addr[31] & ~i_lsu_addr[30] & ~i_lsu_addr[29] &  i_
 							  ~i_lsu_addr[19] & ~i_lsu_addr[18] & ~i_lsu_addr[17] & ~i_lsu_addr[16] & 
 							  ~i_lsu_addr[15] &  i_lsu_addr[14] & ~i_lsu_addr[13] &  i_lsu_addr[12];
 
-logic [9:0] addr_even_1, addr_even_2, addr_odd_1, addr_odd_2;
+logic [14:0] addr_even_1, addr_even_2, addr_odd_1, addr_odd_2;
 logic [7:0] data_even_1, data_even_2, data_odd_1, data_odd_2;
 logic we_even_1, we_even_2, we_odd_1, we_odd_2;
 logic [31:0] mem_ld_data, data_gen;
