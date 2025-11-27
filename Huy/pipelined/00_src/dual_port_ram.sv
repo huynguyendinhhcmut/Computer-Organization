@@ -17,6 +17,10 @@ module dual_port_ram (
 // Declare the memory array
 logic [7:0] ram [0:32767];
 
+initial begin
+        $readmemh("dmem_init_file.txt", ram);
+end
+
 // Port A operations
 always @(posedge clk) begin
 	if (we_a) begin

@@ -7,6 +7,7 @@ module flip_flop_execute_memory (
 	input logic  [31:0] i_alu_data_execute,
 	input logic  [4:0]  i_rd_addr_execute,
 	input logic  [31:0] i_pre_opb_execute,
+	input logic 	    i_pc_sel,
 	
 	output logic [31:0] o_pc_memory, o_pc_four_memory,
 	output logic        o_rd_wren_memory, o_insn_vld_memory, o_mem_wren_memory,
@@ -14,7 +15,8 @@ module flip_flop_execute_memory (
 	output logic [2:0]  o_sl_sel_memory, o_bmask_memory,
 	output logic [31:0] o_alu_data_memory,
 	output logic [4:0]  o_rd_addr_memory,
-	output logic [31:0] o_pre_opb_memory
+	output logic [31:0] o_pre_opb_memory,
+	output logic 	    o_ctrl_memory
 );
 
 always_ff @(posedge i_clk or negedge i_reset) begin
@@ -92,6 +94,13 @@ always_ff @(posedge i_clk or negedge i_reset) begin
 		o_pre_opb_memory <= 0;
 	else
 		o_pre_opb_memory <= i_pre_opb_execute;
+end
+
+always_ff @(posedge i_clk or negedge i_reset) begin
+	if (~i_reset)
+		o_ctrl_memory <= 0;
+	else
+		o_ctrl_memory <= i_pc_sel;
 end
 
 endmodule

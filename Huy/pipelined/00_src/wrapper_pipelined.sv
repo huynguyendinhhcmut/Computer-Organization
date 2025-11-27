@@ -7,6 +7,7 @@ module wrapper_pipelined (
 	output logic [9:0] LEDR,
 	output logic [31:0] GPIO,
 	
+	output logic 		  o_mispred, o_ctrl,
 	output logic [31:0] o_pc_debug,	// Debug program counter.
 	output logic        o_insn_vld,	// Instruction valid.
 	output logic [31:0] o_io_ledg, 	// Output for driving green LEDs.
@@ -15,10 +16,10 @@ module wrapper_pipelined (
 	//output logic [31:0] o_io_lcd	// Output for driving the LCD register. 
 );
 
-pipelined pipeline (.i_clk(CLOCK_50), .i_reset(KEY[3]), .i_io_sw({22'b0, SW[9:0]}), .i_io_key({30'b0, KEY[1:0]}),
+pipelined pipeline (.i_clk(CLOCK_50), .i_reset(KEY[3]), .i_io_sw({22'b0, SW[9:0]}), .i_io_key({29'b0, KEY[2:0]}),
 						  .o_pc_debug(o_pc_debug), .o_insn_vld(o_insn_vld), .o_io_ledr(LEDR), .o_io_ledg(o_io_ledg),
 						  .o_io_hex0(HEX0), .o_io_hex1(HEX1), .o_io_hex2(HEX2), .o_io_hex3(HEX3),
 						  .o_io_hex4(HEX4), .o_io_hex5(HEX5), .o_io_hex6(o_io_hex6), .o_io_hex7(o_io_hex7), 
-						  .o_io_lcd(GPIO));
+						  .o_io_lcd(GPIO),  .o_mispred(o_mispred), .o_ctrl(o_ctrl));
 
 endmodule

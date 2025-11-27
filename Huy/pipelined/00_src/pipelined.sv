@@ -23,6 +23,55 @@ module pipelined (
 
 logic pc_sel;
 
+logic stall_fetch, stall_decode, flush_decode, flush_execute;
+logic [1:0] foward_a_execute, foward_b_execute;
+
+logic [31:0] pc_fetch, pc_four, pc_next;
+logic [31:0] instr_decode;
+
+logic [31:0] pc_decode;
+logic [2:0] br_sel_decode;
+logic pc_jump_sel_decode, rd_wren_decode;
+logic [2:0] imm_sel_decode;
+logic insn_vld_decode, br_un_decode, opa_sel_decode, opb_sel_decode;
+logic [4:0] alu_op_decode;
+logic mem_wren_decode;
+logic [1:0] wb_sel_decode;
+logic [2:0] sl_sel_decode, bmask_decode;
+logic [31:0] immext_decode, rs1_data_decode, rs2_data_decode;
+
+logic [31:0] alu_data_execute;
+logic [31:0] pc_execute, pc_four_execute;
+logic [4:0] rs1_addr_execute, rs2_addr_execute, rd_addr_execute;
+logic [2:0] br_sel_execute;
+logic pc_jump_sel_execute, rd_wren_execute, insn_vld_execute, br_un_execute;
+logic opa_sel_execute, opb_sel_execute;
+logic [4:0] alu_op_execute;
+logic mem_wren_execute;
+logic [1:0] wb_sel_execute;
+logic [2:0] sl_sel_execute, bmask_execute;
+logic [31:0] immext_execute, rs1_data_execute, rs2_data_execute;
+logic [31:0] pre_opa_execute, pre_opb_execute, operand_a_execute, operand_b_execute;
+logic pc_br_sel_execute;
+
+logic [31:0] alu_pc4_data_memory, pc_memory, pc_four_memory;
+logic rd_wren_memory, insn_vld_memory, mem_wren_memory;
+logic [1:0] wb_sel_memory;
+logic [2:0] sl_sel_memory, bmask_memory;
+logic [31:0] alu_data_memory, pre_opb_memory;
+logic [4:0] rd_addr_memory;
+logic [31:0] io_sw;
+logic [1:0] io_key;
+logic [31:0] ld_data;
+logic ctrl_memory;
+
+logic [2:0] sl_sel_final;
+
+logic [4:0] rd_addr_writeback;
+logic rd_wren_writeback;
+logic [31:0] wb_data, alu_pc4_data_writeback;
+logic [1:0] wb_sel_writeback;
+
 //      _   _                        _   ____       _            _   _             
 //     | | | | __ _ ______ _ _ __ __| | |  _ \  ___| |_ ___  ___| |_(_) ___  _ __  
 //     | |_| |/ _` |_  / _` | '__/ _` | | | | |/ _ \ __/ _ \/ __| __| |/ _ \| '_ \ 
@@ -38,9 +87,6 @@ logic pc_sel;
 //      / ___ \| |\ V  V / (_| | |_| \__ \ | |_| | | | | || (_| |   <  __/ | | |   
 //     /_/   \_\_| \_/\_/ \__,_|\__, |___/  \___/|_| |_|\__\__,_|_|\_\___|_| |_|   
 //                              |___/                                              
-
-logic stall_fetch, stall_decode, flush_decode, flush_execute;
-logic [1:0] foward_a_execute, foward_b_execute;
 
 hazard hazard1 (.i_rs1_addr_decode(instr_decode[19:15]), .i_rs2_addr_decode(instr_decode[24:20]),
 					 .i_rs1_addr_execute(rs1_addr_execute),   .i_rs2_addr_execute(rs2_addr_execute), 
@@ -59,9 +105,6 @@ hazard hazard1 (.i_rs1_addr_decode(instr_decode[19:15]), .i_rs2_addr_decode(inst
 //     |  _|  __/ || (__| | | |
 //     |_|  \___|\__\___|_| |_|
 //                             
-
-logic [31:0] pc_fetch, pc_four, pc_next;
-logic [31:0] instr_decode;
 
 always_ff @(posedge i_clk or negedge i_reset) begin
 	if (~i_reset)
@@ -93,17 +136,6 @@ instrmem instr_mem (.i_clk(i_clk), 		   .i_reset(i_reset),
 //     | |_| |  __/ (_| (_) | (_| |  __/
 //     |____/ \___|\___\___/ \__,_|\___|
 //                                      
-
-logic [31:0] pc_decode;
-logic [2:0] br_sel_decode;
-logic pc_jump_sel_decode, rd_wren_decode;
-logic [2:0] imm_sel_decode;
-logic insn_vld_decode, br_un_decode, opa_sel_decode, opb_sel_decode;
-logic [4:0] alu_op_decode;
-logic mem_wren_decode;
-logic [1:0] wb_sel_decode;
-logic [2:0] sl_sel_decode, bmask_decode;
-logic [31:0] immext_decode, rs1_data_decode, rs2_data_decode;
 
 flip_flop_fetch_decode ffIFID (.i_clk(i_clk),                 .i_reset(i_reset), 
 										 .i_stall_decode(stall_decode), .i_flush_decode(flush_decode),
@@ -139,20 +171,6 @@ regfile registerfile (.i_clk(i_clk),                    .i_reset(i_reset),
 //     | |___ >  <  __/ (__| |_| | ||  __/
 //     |_____/_/\_\___|\___|\__,_|\__\___|
 //                                        
-
-logic [31:0] alu_data_execute;
-logic [31:0] pc_execute, pc_four_execute;
-logic [4:0] rs1_addr_execute, rs2_addr_execute, rd_addr_execute;
-logic [2:0] br_sel_execute;
-logic pc_jump_sel_execute, rd_wren_execute, insn_vld_execute, br_un_execute;
-logic opa_sel_execute, opb_sel_execute;
-logic [4:0] alu_op_execute;
-logic mem_wren_execute;
-logic [1:0] wb_sel_execute;
-logic [2:0] sl_sel_execute, bmask_execute;
-logic [31:0] immext_execute, rs1_data_execute, rs2_data_execute;
-logic [31:0] pre_opa_execute, pre_opb_execute, operand_a_execute, operand_b_execute;
-logic pc_br_sel_execute;
 
 assign pc_sel = pc_br_sel_execute | pc_jump_sel_execute;
 
@@ -223,44 +241,20 @@ fullAdder32b pcfourexecute (.a(pc_execute), .b(32'h4), .cin(1'b0), .sum(pc_four_
 //     |_|  |_|\___|_| |_| |_|\___/|_|   \__, |
 //                                       |___/ 
 
-logic [31:0] alu_pc4_data_memory, pc_memory, pc_four_memory;
-logic rd_wren_memory, insn_vld_memory, mem_wren_memory;
-logic [1:0] wb_sel_memory;
-logic [2:0] sl_sel_memory, bmask_memory;
-logic [31:0] alu_data_memory, pre_opb_memory;
-logic [4:0] rd_addr_memory;
-logic [31:0] io_sw;
-logic [1:0] io_key;
-logic [31:0] ld_data;
-
 flip_flop_execute_memory ffEXMEM (.i_clk(i_clk),                         .i_reset(i_reset),
 											 .i_pc_execute(pc_execute),             .i_pc_four_execute(pc_four_execute),
 											 .i_rd_wren_execute(rd_wren_execute),   .i_insn_vld_execute(insn_vld_execute), 
 											 .i_mem_wren_execute(mem_wren_execute), .i_wb_sel_execute(wb_sel_execute),
 											 .i_sl_sel_execute(sl_sel_execute),     .i_bmask_execute(bmask_execute),
 											 .i_alu_data_execute(alu_data_execute), .i_rd_addr_execute(rd_addr_execute),
-											 .i_pre_opb_execute(pre_opb_execute),
+											 .i_pre_opb_execute(pre_opb_execute),   .i_pc_sel(pc_sel),
 	
 											 .o_pc_memory(pc_memory),               .o_pc_four_memory(pc_four_memory),
 											 .o_rd_wren_memory(rd_wren_memory),     .o_insn_vld_memory(insn_vld_memory), 
 											 .o_mem_wren_memory(mem_wren_memory),   .o_wb_sel_memory(wb_sel_memory),
 											 .o_sl_sel_memory(sl_sel_memory),       .o_bmask_memory(bmask_memory),
 											 .o_alu_data_memory(alu_data_memory),   .o_rd_addr_memory(rd_addr_memory),
-											 .o_pre_opb_memory(pre_opb_memory));
-
-always_ff @(posedge i_clk or negedge i_reset) begin
-	if (~i_reset) 
-		io_sw <= 0;
-	else
-		io_sw <= i_io_sw;
-end
-
-always_ff @(posedge i_clk or negedge i_reset) begin
-	if (~i_reset) 
-		io_key <= 0;
-	else
-		io_key <= i_io_key;
-end
+											 .o_pre_opb_memory(pre_opb_memory),     .o_ctrl_memory(ctrl_memory));
 
 always @(*) begin
 	if (wb_sel_memory[0])
@@ -269,9 +263,16 @@ always @(*) begin
 		alu_pc4_data_memory = pc_four_memory;
 end
 
+always_ff @(posedge i_clk or negedge i_reset) begin
+	if (~i_reset)
+		sl_sel_final <= 0;
+	else
+		sl_sel_final <= sl_sel_memory;
+end
+
 lsu lsu1 (.i_clk(i_clk),                .i_reset(i_reset), 
           .i_lsu_addr(alu_data_memory), .i_st_data(pre_opb_memory), 
-			 .i_lsu_wren(mem_wren_memory), .i_sl_sel(sl_sel_memory),
+			 .i_lsu_wren(mem_wren_memory), .i_sl_sel(sl_sel_final),
 			 .i_io_sw(io_sw),              .i_bmask(bmask_memory), 
 			 .i_io_key(io_key),
 			 
@@ -289,19 +290,18 @@ lsu lsu1 (.i_clk(i_clk),                .i_reset(i_reset),
 //        \_/\_/ |_|  |_|\__\___| |____/ \__,_|\___|_|\_\
 //                                                       
 
-logic [4:0] rd_addr_writeback;
-logic rd_wren_writeback;
-logic [31:0] wb_data, alu_pc4_data_writeback;
-logic [1:0] wb_sel_writeback;
-
 flip_flop_memory_writeback ffMEMWB (.i_clk(i_clk),                                     .i_reset(i_reset),
 												.i_rd_wren_memory(rd_wren_memory),                 .i_insn_vld_memory(insn_vld_memory),
 												.i_pc_memory(pc_memory),                           .i_wb_sel_memory(wb_sel_memory),
 												.i_alu_pc4_data_memory(alu_pc4_data_memory),       .i_rd_addr_memory(rd_addr_memory),
+												.i_ctrl_memory(ctrl_memory), 			   .i_io_sw(i_io_sw),
+												.i_io_key(i_io_key),
 	
 												.o_rd_wren_writeback(rd_wren_writeback),           .o_insn_vld_writeback(o_insn_vld),
 												.o_pc_writeback(o_pc_debug),                       .o_wb_sel_writeback(wb_sel_writeback),
-												.o_alu_pc4_data_writeback(alu_pc4_data_writeback), .o_rd_addr_writeback(rd_addr_writeback));
+												.o_alu_pc4_data_writeback(alu_pc4_data_writeback), .o_rd_addr_writeback(rd_addr_writeback),
+												.o_ctrl(o_ctrl),				   .o_io_sw(io_sw),
+												.o_io_key(io_key));
 						
 always @(*) begin
 	if (wb_sel_writeback[1])
@@ -309,5 +309,7 @@ always @(*) begin
 	else
 		wb_data = alu_pc4_data_writeback;
 end
+
+assign o_mispred = flush_decode & flush_execute & pc_br_sel_execute;
 
 endmodule
