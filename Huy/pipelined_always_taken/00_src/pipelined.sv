@@ -76,31 +76,45 @@ logic [1:0] wb_sel_writeback;
 
 logic btb_wren, check_pc_predict;
 logic [31:0] pc_predict;
-logic [9:0] btb_addr;
+logic [31:0] btb_addr;
+logic [31:0] pc_predict_1, pc_predict_2;
+logic flush_out_loop;
 
 //      ____                       _       _____                    _     ____         __  __           
 //     | __ ) _ __ __ _ _ __   ___| |__   |_   _|_ _ _ __ __ _  ___| |_  | __ ) _   _ / _|/ _| ___ _ __ 
 //     |  _ \| '__/ _` | '_ \ / __| '_ \    | |/ _` | '__/ _` |/ _ \ __| |  _ \| | | | |_| |_ / _ \ '__|
 //     | |_) | | | (_| | | | | (__| | | |   | | (_| | | | (_| |  __/ |_  | |_) | |_| |  _|  _|  __/ |   
 //     |____/|_|  \__,_|_| |_|\___|_| |_|   |_|\__,_|_|  \__, |\___|\__| |____/ \__,_|_| |_|  \___|_|   
-//                                                       |___/                                          
+//                                                       |___/                                       
 
-assign check_pc_predict = &(alu_data_execute ^ pc_predict);
+always_ff @(posedge i_clk or negedge i_reset) begin
+	if (~i_reset) begin
+		pc_predict_1 <= 0;
+		pc_predict_2 <= 0;
+	end else begin
+		pc_predict_1 <= pc_predict;
+		pc_predict_2 <= pc_predict_1;
+	end
+end
+
+assign check_pc_predict = ~(& (~(alu_data_execute ^ pc_predict_2)));
 								  
 assign btb_wren = pc_sel & check_pc_predict;
 
 always @(*) begin
-	if (ctrl_execute)
-		btb_addr = pc_execute[11:2];
+	if (btb_wren)
+		btb_addr = pc_execute;
 	else
-		btb_addr = pc_fetch[11:2];
+		btb_addr = pc_fetch;
 end
 
 btb btb1 (.i_clk(i_clk), 		 .i_btb_wren(btb_wren),
-			 .i_pc_four(pc_four), .i_btb_data({10'b0, pc_execute[11:2], alu_data_execute}),
+			 .i_pc_four(pc_four), .i_btb_data({btb_wren, pc_execute[31:12], alu_data_execute}),
 			 .i_btb_addr(btb_addr),
 	
 			 .o_pc_predict(pc_predict));
+			 
+assign flush_out_loop = ctrl_execute & ~pc_sel & ~check_pc_predict;
 
 //      _   _                        _   ____       _            _   _             
 //     | | | | __ _ ______ _ _ __ __| | |  _ \  ___| |_ ___  ___| |_(_) ___  _ __  
@@ -118,7 +132,7 @@ hazard hazard1 (.i_rs1_addr_decode(instr_decode[19:15]), .i_rs2_addr_decode(inst
 					 .i_rd_addr_execute(rd_addr_execute),     .i_rd_addr_memory(rd_addr_memory),
 					 .i_rd_addr_writeback(rd_addr_writeback), .i_pc_sel(btb_wren),
 					 .i_wb_sel_execute(wb_sel_execute),			.i_rd_wren_memory(rd_wren_memory),
-					 .i_rd_wren_writeback(rd_wren_writeback),
+					 .i_rd_wren_writeback(rd_wren_writeback), .i_out_loop(flush_out_loop),
 
 					 .o_foward_a_execution(foward_a_execute), .o_foward_b_execution(foward_b_execute),
 					 .o_stall_fetch(stall_fetch),             .o_stall_decode(stall_decode), 
@@ -141,12 +155,14 @@ always_ff @(posedge i_clk or negedge i_reset) begin
 end
 
 always @(*) begin
-	if (btb_wren)
-		pc_next = alu_data_execute;
-	else
-		pc_next = pc_four;
+	case ({pc_sel, check_pc_predict})
+		2'b00: pc_next = pc_four_execute;
+		2'b01: pc_next = pc_predict;
+		2'b10: pc_next = pc_predict;
+		2'b11: pc_next = alu_data_execute;
+	endcase
 end
-		
+
 fullAdder32b pcfour (.a(pc_fetch), .b(32'h4), .cin(1'b0), .sum(pc_four)); // pc_four
 
 instrmem instr_mem (.i_clk(i_clk), 		   .i_reset(i_reset), 

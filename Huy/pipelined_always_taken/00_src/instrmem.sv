@@ -7,7 +7,7 @@ module instrmem (
 logic [31:0] memory [0:4095];   
 	
 initial begin
-   $readmemh("program.txt", memory);
+   $readmemh("/home/nguyendinhhuy/rtl/pipelined_always_taken/rtl/program.txt", memory);
 end
 
 always @(posedge i_clk or negedge i_reset) begin

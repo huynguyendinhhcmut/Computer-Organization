@@ -2,15 +2,15 @@ module ram_btb (
     input logic  i_clk,
     input logic  i_btb_wren,
     input logic  [9:0]  i_addr,
-    input logic  [31:0] i_data,
+    input logic  [52:0] i_data,
     
-	 output logic [51:0] o_data
+	 output logic [52:0] o_data
 );
 
-reg [51:0] ram [0:1023];
+reg [52:0] ram [0:1023];
 
 initial begin
-	$readmemh("btb_init_file.txt", ram);
+	$readmemh("/home/nguyendinhhuy/rtl/pipelined_always_taken/rtl/btb_init_file.txt", ram);
 end
 
 always_ff @(posedge i_clk) begin

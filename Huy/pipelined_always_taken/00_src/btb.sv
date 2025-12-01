@@ -1,21 +1,21 @@
 module btb (
 	input logic         i_clk, i_btb_wren,
 	input logic [31:0]  i_pc_four,
-	input logic [51:0]  i_btb_data,
+	input logic [52:0]  i_btb_data,
 	input logic [31:0]  i_btb_addr,
 	
 	output logic [31:0] o_pc_predict
 );
 
-logic [51:0] pc_predict;
-logic hit;
+logic [52:0] pc_predict;
+logic hit, pre_hit;
 
 ram_btb rambtb (.i_clk(i_clk),		       .i_btb_wren(i_btb_wren),
 					 .i_addr(i_btb_addr[11:2]), .i_data(i_btb_data),
     
 					 .o_data(pc_predict));
 
-assign hit = (~(pc_predict[51] ^ i_btb_addr[31])) & (~(pc_predict[50] ^ i_btb_addr[30])) &
+assign pre_hit = (~(pc_predict[51] ^ i_btb_addr[31])) & (~(pc_predict[50] ^ i_btb_addr[30])) &
 				 (~(pc_predict[49] ^ i_btb_addr[29])) & (~(pc_predict[48] ^ i_btb_addr[28])) &
 				 (~(pc_predict[47] ^ i_btb_addr[27])) & (~(pc_predict[46] ^ i_btb_addr[26])) &
 				 (~(pc_predict[45] ^ i_btb_addr[25])) & (~(pc_predict[44] ^ i_btb_addr[24])) &
@@ -25,7 +25,9 @@ assign hit = (~(pc_predict[51] ^ i_btb_addr[31])) & (~(pc_predict[50] ^ i_btb_ad
 				 (~(pc_predict[37] ^ i_btb_addr[17])) & (~(pc_predict[36] ^ i_btb_addr[16])) &
 				 (~(pc_predict[35] ^ i_btb_addr[15])) & (~(pc_predict[34] ^ i_btb_addr[14])) &
 				 (~(pc_predict[33] ^ i_btb_addr[13])) & (~(pc_predict[32] ^ i_btb_addr[12]));
-				 
+	
+assign hit = pre_hit & pc_predict[52];
+
 always @(*) begin
 	if (hit) 
 		o_pc_predict = pc_predict[31:0];

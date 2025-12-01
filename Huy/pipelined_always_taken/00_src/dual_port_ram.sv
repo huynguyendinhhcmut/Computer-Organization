@@ -18,7 +18,7 @@ module dual_port_ram (
 logic [7:0] ram [0:32767];
 
 initial begin
-        $readmemh("dmem_init_file.txt", ram);
+        $readmemh("/home/nguyendinhhuy/rtl/pipelined_always_taken/rtl/dmem_init_file.txt", ram);
 end
 
 // Port A operations

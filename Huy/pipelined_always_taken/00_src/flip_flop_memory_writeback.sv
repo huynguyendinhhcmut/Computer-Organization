@@ -16,7 +16,7 @@ module flip_flop_memory_writeback (
 	output logic [4:0]  o_rd_addr_writeback,
 	output logic 	    o_ctrl,
 	output logic [31:0] o_io_sw, 
-	output logic [2:0]  o_io_key
+	output logic [1:0]  o_io_key
 );
 
 always_ff @(posedge i_clk or negedge i_reset) begin
