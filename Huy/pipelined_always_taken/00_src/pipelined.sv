@@ -154,14 +154,11 @@ always_ff @(posedge i_clk or negedge i_reset) begin
 		pc_fetch <= pc_next;
 end
 
-always @(*) begin
-	case ({pc_sel, check_pc_predict})
-		2'b00: pc_next = pc_four_execute;
-		2'b01: pc_next = pc_predict;
-		2'b10: pc_next = pc_predict;
-		2'b11: pc_next = alu_data_execute;
-	endcase
-end
+mux4to1 pcnextsel (.i_data_0(pc_four_execute), .i_data_1(pc_predict), 
+					    .i_data_2(pc_predict),      .i_data_3(alu_data_execute),
+					    .i_sel({pc_sel, check_pc_predict}),     
+					  
+					    .o_data(pc_next));
 
 fullAdder32b pcfour (.a(pc_fetch), .b(32'h4), .cin(1'b0), .sum(pc_four)); // pc_four
 

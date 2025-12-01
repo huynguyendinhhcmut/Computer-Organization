@@ -11,9 +11,14 @@ logic [52:0] pc_predict;
 logic hit, pre_hit;
 
 ram_btb rambtb (.i_clk(i_clk),		       .i_btb_wren(i_btb_wren),
-					 .i_addr(i_btb_addr[11:2]), .i_data(i_btb_data),
+					 .i_addr(i_btb_addr[11:2]), .i_data(i_btb_data[31:0]),
     
-					 .o_data(pc_predict));
+					 .o_data(pc_predict[31:0]));
+					 
+ram_tag_valid ramtagvalid (.i_clk(i_clk),		         .i_btb_wren(i_btb_wren),
+									.i_addr(i_btb_addr[11:2]), .i_data(i_btb_data[52:32]),
+    
+									.o_data(pc_predict[52:32]));
 
 assign pre_hit = (~(pc_predict[51] ^ i_btb_addr[31])) & (~(pc_predict[50] ^ i_btb_addr[30])) &
 				 (~(pc_predict[49] ^ i_btb_addr[29])) & (~(pc_predict[48] ^ i_btb_addr[28])) &
@@ -36,3 +41,4 @@ always @(*) begin
 end
 
 endmodule
+
