@@ -1,5 +1,0 @@
-//
-// File created by:  xrun
-// Do not modify this file
-
-s1::(08Dec2025:16:10:28):( xrun -access +rwc -f ./flist.f )&&(./xcelium.d/env.d/env.history.08Dec2025_16_10_28)
