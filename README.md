@@ -107,3 +107,7 @@ The focus is on designing and comparing at least **two models of pipelined proce
 A comprehensive project report is required, detailing the design process, challenges faced, and solutions implemented. Visual aids like diagrams and charts are encouraged.
 
 The report must include sections for **introduction, methodology, results, and conclusions**. The Milestone 3 report specifically requires recording the synthesis and performance data for all implemented models.
+
+## Block Diagram
+<img width="4057" height="2872" alt="1_bit_predict" src="https://github.com/user-attachments/assets/ab08c9c5-646f-42d9-8a53-4014a8b3d8b5" />
+<img width="4056" height="2872" alt="2_bit_predict" src="https://github.com/user-attachments/assets/1827b9c8-4eb1-45e7-9e8a-1a06000d90df" />
