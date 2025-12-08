@@ -1,0 +1,420 @@
+xrun(64): 24.09-s005: (c) Copyright 1995-2025 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	24.09-s005: Started on Dec 08, 2025 at 16:10:28 +07
+xrun
+	-access +rwc
+	-f ./flist.f
+		-sv
+		-timescale 1ns/100ps
+		./../00_src/alu.sv
+		./../00_src/brc.sv
+		./../00_src/btb.sv
+		./../00_src/comparator32b_signed.sv
+		./../00_src/controlunit.sv
+		./../00_src/datagen.sv
+		./../00_src/decode_hex.sv
+		./../00_src/decodelsu.sv
+		./../00_src/dual_port_ram.sv
+		./../00_src/flip_flop_decode_execute.sv
+		./../00_src/flip_flop_execute_memory.sv
+		./../00_src/flip_flop_fetch_decode.sv
+		./../00_src/flip_flop_memory_writeback.sv
+		./../00_src/fullAdder32b.sv
+		./../00_src/hazard.sv
+		./../00_src/immgen.sv
+		./../00_src/instrmem.sv
+		./../00_src/lsu.sv
+		./../00_src/memory.sv
+		./../00_src/mux4to1.sv
+		./../00_src/mux8to1.sv
+		./../00_src/pipelined.sv
+		./../00_src/ram_btb.sv
+		./../00_src/ram_tag_valid.sv
+		./../00_src/regfile.sv
+		./../00_src/shift.sv
+		./../01_bench/driver.sv
+		./../01_bench/scoreboard.sv
+		./../01_bench/tbench.sv
+		./../01_bench/tlib.svh
+file: ./../00_src/alu.sv
+	module worklib.alu:sv
+		errors: 0, warnings: 0
+file: ./../00_src/brc.sv
+	module worklib.brc:sv
+		errors: 0, warnings: 0
+file: ./../00_src/btb.sv
+	module worklib.btb:sv
+		errors: 0, warnings: 0
+file: ./../00_src/comparator32b_signed.sv
+	module worklib.comparator32b_signed:sv
+		errors: 0, warnings: 0
+	module worklib.comparator32b:sv
+		errors: 0, warnings: 0
+	module worklib.comparator4b:sv
+		errors: 0, warnings: 0
+	module worklib.comparator2b:sv
+		errors: 0, warnings: 0
+file: ./../00_src/controlunit.sv
+	module worklib.controlunit:sv
+		errors: 0, warnings: 0
+file: ./../00_src/datagen.sv
+	module worklib.datagen:sv
+		errors: 0, warnings: 0
+file: ./../00_src/decode_hex.sv
+	module worklib.decode_hex:sv
+		errors: 0, warnings: 0
+file: ./../00_src/decodelsu.sv
+	module worklib.decodelsu:sv
+		errors: 0, warnings: 0
+file: ./../00_src/dual_port_ram.sv
+	module worklib.dual_port_ram:sv
+		errors: 0, warnings: 0
+file: ./../00_src/flip_flop_decode_execute.sv
+	module worklib.flip_flop_decode_execute:sv
+		errors: 0, warnings: 0
+file: ./../00_src/flip_flop_execute_memory.sv
+	module worklib.flip_flop_execute_memory:sv
+		errors: 0, warnings: 0
+file: ./../00_src/flip_flop_fetch_decode.sv
+	module worklib.flip_flop_fetch_decode:sv
+		errors: 0, warnings: 0
+file: ./../00_src/flip_flop_memory_writeback.sv
+	module worklib.flip_flop_memory_writeback:sv
+		errors: 0, warnings: 0
+file: ./../00_src/fullAdder32b.sv
+	module worklib.fullAdder32b:sv
+		errors: 0, warnings: 0
+	module worklib.fullAdder10b:sv
+		errors: 0, warnings: 0
+	module worklib.fullAdder15b:sv
+		errors: 0, warnings: 0
+	module worklib.fullAdder:sv
+		errors: 0, warnings: 0
+	module worklib.fullAdder64b:sv
+		errors: 0, warnings: 0
+file: ./../00_src/hazard.sv
+	module worklib.hazard:sv
+		errors: 0, warnings: 0
+file: ./../00_src/immgen.sv
+	module worklib.immgen:sv
+		errors: 0, warnings: 0
+file: ./../00_src/instrmem.sv
+	module worklib.instrmem:sv
+		errors: 0, warnings: 0
+file: ./../00_src/lsu.sv
+	module worklib.lsu:sv
+		errors: 0, warnings: 0
+file: ./../00_src/memory.sv
+	module worklib.memory:sv
+		errors: 0, warnings: 0
+file: ./../00_src/mux4to1.sv
+	module worklib.mux4to1:sv
+		errors: 0, warnings: 0
+file: ./../00_src/mux8to1.sv
+	module worklib.mux8to1:sv
+		errors: 0, warnings: 0
+file: ./../00_src/pipelined.sv
+	module worklib.pipelined:sv
+		errors: 0, warnings: 0
+file: ./../00_src/ram_btb.sv
+	module worklib.ram_btb:sv
+		errors: 0, warnings: 0
+file: ./../00_src/ram_tag_valid.sv
+	module worklib.ram_tag_valid:sv
+		errors: 0, warnings: 0
+file: ./../00_src/regfile.sv
+	module worklib.regfile:sv
+		errors: 0, warnings: 0
+file: ./../00_src/shift.sv
+	module worklib.shift:sv
+		errors: 0, warnings: 0
+file: ./../01_bench/driver.sv
+	module worklib.driver:sv
+		errors: 0, warnings: 0
+file: ./../01_bench/scoreboard.sv
+	module worklib.scoreboard:sv
+		errors: 0, warnings: 0
+file: ./../01_bench/tbench.sv
+	module worklib.tbench:sv
+		errors: 0, warnings: 0
+file: ./../01_bench/tlib.svh
+		Caching library 'worklib' ....... Done
+	Elaborating the design hierarchy:
+  pipelined dut (
+              |
+xmelab: *W,CUVWSI (../01_bench/tbench.sv,38|14): 1 input port was not connected:
+xmelab: (../00_src/pipelined.sv,5): i_io_key
+
+fullAdder32b pcfour (.a(pc_fetch), .b(32'h4), .cin(1'b0), .sum(pc_four)); // pc_four
+                  |
+xmelab: *W,CUVWSP (../00_src/pipelined.sv,165|18): 1 output port was not connected:
+xmelab: (../00_src/fullAdder32b.sv,5): cout
+
+fullAdder32b fa1 (.a(i_operand_a), .b(i_operand_b), .cin(i_alu_op[0]), .sum(sum));
+               |
+xmelab: *W,CUVWSP (../00_src/alu.sv,14|15): 1 output port was not connected:
+xmelab: (../00_src/fullAdder32b.sv,5): cout
+
+comparator32b_signed comp_signed (.a(i_operand_a), .b(i_operand_b), .signed_mode(~i_alu_op[0]), .Lt(less));
+                               |
+xmelab: *W,CUVWSP (../00_src/alu.sv,15|31): 2 output ports were not connected:
+xmelab: (../00_src/comparator32b_signed.sv,4): Eq
+xmelab: (../00_src/comparator32b_signed.sv,4): Gr
+
+comparator4b cmp0_3   (.a(a[3:0]),   .b(b[3:0]),   .Gr(gr1[0]), .Lt(lt1[0]));
+                  |
+xmelab: *W,CUVWSP (../00_src/comparator32b_signed.sv,42|18): 1 output port was not connected:
+xmelab: (../00_src/comparator32b_signed.sv,62): Eq
+
+comparator4b cmp4_7   (.a(a[7:4]),   .b(b[7:4]),   .Gr(gr1[1]), .Lt(lt1[1]));
+                  |
+xmelab: *W,CUVWSP (../00_src/comparator32b_signed.sv,43|18): 1 output port was not connected:
+xmelab: (../00_src/comparator32b_signed.sv,62): Eq
+
+comparator4b cmp8_11  (.a(a[11:8]),  .b(b[11:8]),  .Gr(gr1[2]), .Lt(lt1[2]));
+                   |
+xmelab: *W,CUVWSP (../00_src/comparator32b_signed.sv,44|19): 1 output port was not connected:
+xmelab: (../00_src/comparator32b_signed.sv,62): Eq
+
+comparator4b cmp12_15 (.a(a[15:12]), .b(b[15:12]), .Gr(gr1[3]), .Lt(lt1[3]));
+                    |
+xmelab: *W,CUVWSP (../00_src/comparator32b_signed.sv,45|20): 1 output port was not connected:
+xmelab: (../00_src/comparator32b_signed.sv,62): Eq
+
+comparator4b cmp16_19 (.a(a[19:16]), .b(b[19:16]), .Gr(gr1[4]), .Lt(lt1[4]));
+                    |
+xmelab: *W,CUVWSP (../00_src/comparator32b_signed.sv,46|20): 1 output port was not connected:
+xmelab: (../00_src/comparator32b_signed.sv,62): Eq
+
+comparator4b cmp20_23 (.a(a[23:20]), .b(b[23:20]), .Gr(gr1[5]), .Lt(lt1[5]));
+                    |
+xmelab: *W,CUVWSP (../00_src/comparator32b_signed.sv,47|20): 1 output port was not connected:
+xmelab: (../00_src/comparator32b_signed.sv,62): Eq
+
+comparator4b cmp24_27 (.a(a[27:24]), .b(b[27:24]), .Gr(gr1[6]), .Lt(lt1[6]));
+                    |
+xmelab: *W,CUVWSP (../00_src/comparator32b_signed.sv,48|20): 1 output port was not connected:
+xmelab: (../00_src/comparator32b_signed.sv,62): Eq
+
+comparator4b cmp28_31 (.a(a[31:28]), .b(b[31:28]), .Gr(gr1[7]), .Lt(lt1[7]));
+                    |
+xmelab: *W,CUVWSP (../00_src/comparator32b_signed.sv,49|20): 1 output port was not connected:
+xmelab: (../00_src/comparator32b_signed.sv,62): Eq
+
+comparator4b cmp2_0 (.a(gr1[3:0]), .b(lt1[3:0]), .Gr(gr2[0]), .Lt(lt2[0]));
+                  |
+xmelab: *W,CUVWSP (../00_src/comparator32b_signed.sv,51|18): 1 output port was not connected:
+xmelab: (../00_src/comparator32b_signed.sv,62): Eq
+
+comparator4b cmp2_1 (.a(gr1[7:4]), .b(lt1[7:4]), .Gr(gr2[1]), .Lt(lt2[1]));
+                  |
+xmelab: *W,CUVWSP (../00_src/comparator32b_signed.sv,52|18): 1 output port was not connected:
+xmelab: (../00_src/comparator32b_signed.sv,62): Eq
+
+comparator2b cmp2_final (.a(gr2), .b(lt2), .Gr(Gr), .Lt(Lt));
+                      |
+xmelab: *W,CUVWSP (../00_src/comparator32b_signed.sv,54|22): 1 output port was not connected:
+xmelab: (../00_src/comparator32b_signed.sv,73): Eq
+
+comparator32b_signed cmp_signed (.a(i_rs1_data), .b(i_rs2_data), .signed_mode(i_br_un), .Eq(br_equal), .Lt(br_less));
+                              |
+xmelab: *W,CUVWSP (../00_src/brc.sv,12|30): 1 output port was not connected:
+xmelab: (../00_src/comparator32b_signed.sv,4): Gr
+
+fullAdder32b pcfourexecute (.a(pc_execute), .b(32'h4), .cin(1'b0), .sum(pc_four_execute)); // pc_four_execute
+                         |
+xmelab: *W,CUVWSP (../00_src/pipelined.sv,277|25): 1 output port was not connected:
+xmelab: (../00_src/fullAdder32b.sv,5): cout
+
+fullAdder15b map_addr_even1 (.a(i_lsu_addr[14:0]), .b(15'h2), .cin(1'b0), .sum(next_addr_even1)); // even1 = addr + 2
+                          |
+xmelab: *W,CUVWSP (../00_src/decodelsu.sv,18|26): 1 output port was not connected:
+xmelab: (../00_src/fullAdder32b.sv,75): cout
+
+fullAdder15b map_addr_even2 (.a(next_addr_even1), .b(15'h1), .cin(1'b0), .sum(next_addr_even2)); // even2 = addr + 3
+                          |
+xmelab: *W,CUVWSP (../00_src/decodelsu.sv,20|26): 1 output port was not connected:
+xmelab: (../00_src/fullAdder32b.sv,75): cout
+
+fullAdder15b map_addr_odd2  (.a(next_addr_odd1 ), .b(15'h2), .cin(1'b0), .sum(next_addr_odd2 )); // odd2  = addr + 1
+                         |
+xmelab: *W,CUVWSP (../00_src/decodelsu.sv,21|25): 1 output port was not connected:
+xmelab: (../00_src/fullAdder32b.sv,75): cout
+
+	Top level design units:
+		$unit_0x2c7b0e39
+		fullAdder10b
+		fullAdder64b
+		mux8to1
+		tbench
+	Building instance overlay tables: .................... Done
+	Generating native compiled code:
+		worklib.scoreboard:sv <0x55ddf8b7>
+			streams:   7, words: 10981
+		worklib.driver:sv <0x17c012f1>
+			streams:   1, words:   210
+		worklib.flip_flop_memory_writeback:sv <0x394a0c1a>
+			streams:  14, words:  3847
+		worklib.decode_hex:sv <0x13896477>
+			streams:   1, words:   622
+		worklib.datagen:sv <0x0cee6995>
+			streams:   1, words:   543
+		worklib.dual_port_ram:sv <0x64e45503>
+			streams:   7, words:  2973
+		worklib.memory:sv <0x6ebef763>
+			streams:   7, words:  2653
+		worklib.fullAdder15b:sv <0x607dae3e>
+			streams:  34, words: 16633
+		worklib.decodelsu:sv <0x46109454>
+			streams:  10, words: 13089
+		worklib.lsu:sv <0x3daf2ead>
+			streams:  69, words: 33520
+		worklib.flip_flop_execute_memory:sv <0x45af3c2a>
+			streams:  18, words:  5094
+		worklib.comparator32b_signed:sv <0x5621b8cc>
+			streams:   4, words:  2691
+		worklib.brc:sv <0x400222bd>
+			streams:   3, words:  1543
+		worklib.shift:sv <0x542df9df>
+			streams:   7, words:  4635
+		worklib.comparator2b:sv <0x37cc7fe5>
+			streams:   1, words:  1117
+		worklib.comparator4b:sv <0x431255a3>
+			streams:   1, words:  1420
+		worklib.comparator4b:sv <0x4ca474f6>
+			streams:   1, words:  1419
+		worklib.comparator32b:sv <0x3f112afa>
+			streams:  27, words:  9943
+		worklib.comparator32b_signed:sv <0x606618ba>
+			streams:   4, words:  2456
+		worklib.fullAdder32b:sv <0x766d8371>
+			streams:  99, words: 36091
+		worklib.alu:sv <0x20e632b5>
+			streams:   6, words:  2625
+		worklib.flip_flop_decode_execute:sv <0x64773453>
+			streams:   4, words:  9255
+		worklib.regfile:sv <0x43a71d0a>
+			streams:  37, words: 15628
+		worklib.immgen:sv <0x1e58b390>
+			streams:   1, words:   829
+		worklib.controlunit:sv <0x454336d8>
+			streams:  15, words: 36449
+		worklib.flip_flop_fetch_decode:sv <0x6327aefe>
+			streams:   2, words:   621
+		worklib.instrmem:sv <0x181c7b87>
+			streams:   3, words:  1012
+		worklib.fullAdder32b:sv <0x7a3adf3f>
+			streams:  68, words: 34561
+		worklib.mux4to1:sv <0x4d51b2df>
+			streams:   1, words:   360
+		worklib.hazard:sv <0x1f4ed279>
+			streams:   9, words:  4293
+		worklib.ram_tag_valid:sv <0x24c07c71>
+			streams:   5, words:  1628
+		worklib.ram_btb:sv <0x522fb201>
+			streams:   5, words:  1539
+		worklib.btb:sv <0x0a48102a>
+			streams:   7, words:  4693
+		worklib.pipelined:sv <0x72ce5947>
+			streams: 176, words: 52694
+		worklib.tbench:sv <0x073376c4>
+			streams:  38, words:  9708
+		worklib.mux8to1:sv <0x60cabf69>
+			streams:   1, words:   384
+		worklib.fullAdder64b:sv <0x3cab07f1>
+			streams: 132, words: 88534
+		worklib.fullAdder:sv <0x114a17b2>
+			streams:   1, words:   492
+		worklib.fullAdder10b:sv <0x37970ddd>
+			streams:  24, words: 10381
+		worklib.\$unit_0x2c7b0e39 :compilation_unit <0x533bc874>
+			streams:   3, words:  6069
+	Building instance specific data structures.
+	Loading native compiled code:     .................... Done
+	Design hierarchy summary:
+		                   Instances  Unique
+		Modules:                 286      36
+		Primitives:                8       1
+		Registers:               912     387
+		Scalar wires:          2,173       -
+		Expanded wires:          259      10
+		Vectored wires:          332       -
+		Always blocks:            87      75
+		Initial blocks:           11      10
+		Cont. assignments:       275      87
+		Pseudo assignments:      808       -
+		Compilation units:         1       1
+		Process Clocks:           37       5
+		Simulation timescale:  100ps
+	Writing initial simulation snapshot: worklib.fullAdder10b:sv
+Loading snapshot worklib.fullAdder10b:sv .................... Done
+xcelium> source /home/yellow/ctmt_cttt_4/tools/eda/cadence/XCELIUM2409/tools/xcelium/files/xmsimrc
+xcelium> run
+xmsim: *W,RMEMNOF: $readmem error: open failed on file "/home/yellow/ctmt_cttt_4/pipelined_fowarding_always_taken_1_bit_branch_prediction/02_test/btb_init_file.txt".
+            File: ../00_src/ram_btb.sv, line = 13, pos = 124
+           Scope: tbench.dut.btb1.rambtb
+            Time: 0 FS + 0
+
+xmsim: *W,RMEMNOF: $readmem error: open failed on file "/home/yellow/ctmt_cttt_4/pipelined_fowarding_always_taken_1_bit_branch_prediction/02_test/btb_init_file.txt".
+            File: ../00_src/ram_tag_valid.sv, line = 13, pos = 131
+           Scope: tbench.dut.btb1.ramtagvalid
+            Time: 0 FS + 0
+
+
+PIPELINE - ISA tests
+
+add......PASS
+addi.....PASS
+sub......PASS
+and......PASS
+andi.....PASS
+or.......PASS
+ori......PASS
+xor......PASS
+xori.....PASS
+slt......PASS
+slti.....PASS
+sltu.....PASS
+sltiu....PASS
+sll......PASS
+slli.....PASS
+srl......PASS
+srli.....PASS
+sra......PASS
+srai.....PASS
+lw.......PASS
+lh.......PASS
+lhu......PASS
+lb.......PASS
+lbu......PASS
+sw.......PASS
+sh.......PASS
+sb.......PASS
+auipc....PASS
+lui......PASS
+beq......PASS
+bne......PASS
+blt......PASS
+bltu.....PASS
+bge......PASS
+bgeu.....PASS
+jal......PASS
+jalr.....PASS
+malgn....PASS
+iosw.....PASS
+
+=================== Result ===================
+Total Clock Cycles Executed = 7170
+Total Instructions Executed = 4826
+Total Branch Instructions   = 1602
+Total Branch Mispredictions = 1119
+
+----------------------------------------------
+Instruction Per Cycle (IPC) = 0.67
+Branch Misprediction Rate   = 69.85 %
+
+END of ISA tests
+
+Simulation complete via $finish(1) at time 28732 NS + 1
+../01_bench/scoreboard.sv:85         $finish;
+xcelium> exit
+TOOL:	xrun(64)	24.09-s005: Exiting on Dec 08, 2025 at 16:10:30 +07  (total: 00:00:02)
