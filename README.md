@@ -1,4 +1,11 @@
-# 💻 EE3043: Computer Architecture - Pipelined RISC-V Processor
+# 💻 EE3043: Computer Architecture - Pipelined RISC-V Processor <img width="136" height="128" alt="image" src="https://github.com/user-attachments/assets/785eab93-d987-4ada-a672-7f45f5784f0f" /><img width="136" height="128" alt="image" src="https://github.com/user-attachments/assets/a8340193-d091-4fe1-8de9-6b83fb13e6f5" /><img width="136" height="128" alt="image" src="https://github.com/user-attachments/assets/b15c60b1-6cd1-4ec1-8acf-a2094a33a81b" /><img width="136" height="128" alt="image" src="https://github.com/user-attachments/assets/3afcb72e-b4fb-41b6-ab28-5e77f4f8dab1" /><img width="136" height="128" alt="image" src="https://github.com/user-attachments/assets/28ee4c5f-87cd-4861-a857-f520dd1a0a45" /><img width="136" height="128" alt="image" src="https://github.com/user-attachments/assets/0b459f0c-e74d-42af-8e52-32639a4239c0" /><img width="136" height="128" alt="image" src="https://github.com/user-attachments/assets/9049a304-a47b-4f94-8fc7-9235925fe27d" />
+
+
+
+
+
+
+
 
 This repository contains the design, implementation, and verification files for the Computer Architecture course project at HCMC University of Technology, VNU-HCM.
 
@@ -147,3 +154,6 @@ end:
 
 ### Branch Prediction Comparison
 <img width="1919" height="253" alt="image" src="https://github.com/user-attachments/assets/69142ec4-faeb-4c70-8f0d-2f7115f5cb17" />
+
+### Kit DE10 Implementation
+https://www.youtube.com/watch?v=mxOSGJVKNEY
