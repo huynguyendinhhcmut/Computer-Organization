@@ -1,11 +1,4 @@
-# 💻 EE3043: Computer Architecture - Pipelined RISC-V Processor <img width="136" height="128" alt="image" src="https://github.com/user-attachments/assets/785eab93-d987-4ada-a672-7f45f5784f0f" /><img width="136" height="128" alt="image" src="https://github.com/user-attachments/assets/a8340193-d091-4fe1-8de9-6b83fb13e6f5" /><img width="136" height="128" alt="image" src="https://github.com/user-attachments/assets/b15c60b1-6cd1-4ec1-8acf-a2094a33a81b" /><img width="136" height="128" alt="image" src="https://github.com/user-attachments/assets/3afcb72e-b4fb-41b6-ab28-5e77f4f8dab1" />
-
-
-
-
-
-
-
+# 💻 EE3043: Computer Architecture - Pipelined RISC-V Processor <img src="https://flagcdn.com/w40/vn.png" alt="Vietnam Flag" />
 
 This repository contains the design, implementation, and verification files for the Computer Architecture course project at HCMC University of Technology, VNU-HCM.
 
