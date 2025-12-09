@@ -111,3 +111,38 @@ The report must include sections for **introduction, methodology, results, and c
 ## Block Diagram
 <img width="4057" height="2872" alt="1_bit_predict" src="https://github.com/user-attachments/assets/ab08c9c5-646f-42d9-8a53-4014a8b3d8b5" />
 <img width="4056" height="2872" alt="2_bit_predict" src="https://github.com/user-attachments/assets/1827b9c8-4eb1-45e7-9e8a-1a06000d90df" />
+
+## Branch Prediction Comparison
+<img width="1919" height="253" alt="image" src="https://github.com/user-attachments/assets/69142ec4-faeb-4c70-8f0d-2f7115f5cb17" />
+
+### Benchmark Program
+The following assembly code was used as a benchmark to evaluate the performance of different prediction schemes. It features nested loops and frequent branching to stress-test the predictors.
+
+```assembly
+    addi x13, x0, 100
+    
+again:    
+    addi x6, x0, 50
+    addi x7, x0, 60
+    jal x1, loop_x6
+    jal x2, loop_x7
+    addi x13, x13, -1
+    bne x13, x0, again
+    jal x3, end
+    
+loop_x6:
+    addi x6, x6, -1
+    sb x6, 0(x8)
+    li x9, 2048
+    bne x6, x0, loop_x6
+    jalr x0, x1, 0
+    
+loop_x7:    
+    addi x7, x7, -1
+    sb x7, 0(x9)
+    li x12, 16384
+    bne x7, x0, loop_x7
+    jalr x0, x2, 0
+    
+end:
+    li x30, 18170208
