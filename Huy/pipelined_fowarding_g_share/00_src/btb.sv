@@ -1,0 +1,56 @@
+module btb (
+	input logic         i_clk, i_btb_wren, i_ctrl_execute,
+	input logic [31:0]  i_pc_four,
+	input logic [63:0]  i_btb_data,
+	input logic [31:0]  i_btb_addr,
+    input logic [9 :0]  i_addr_xor,
+	
+	output logic [31:0] o_pc_predict,
+    output logic [1:0]  o_predict_state
+);
+
+logic [63:0] pc_predict;
+logic hit, pre_hit;
+
+ram_btb rambtb (.i_clk(i_clk),		       .i_btb_wren(i_btb_wren),
+					 .i_addr(i_addr_xor), .i_data(i_btb_data[31:0]),
+    
+					 .o_data(pc_predict[31:0]));
+					 
+ram_tag_valid ramtagvalid (.i_clk(i_clk),		         .i_btb_wren(i_btb_wren),
+									.i_addr(i_addr_xor), .i_data(i_btb_data[63:32]),
+    
+									.o_data(pc_predict[63:32]));
+
+assign pre_hit = 
+    (~(pc_predict[61] ^ i_btb_addr[31])) & (~(pc_predict[60] ^ i_btb_addr[30])) &
+    (~(pc_predict[59] ^ i_btb_addr[29])) & (~(pc_predict[58] ^ i_btb_addr[28])) &
+    (~(pc_predict[57] ^ i_btb_addr[27])) & (~(pc_predict[56] ^ i_btb_addr[26])) &
+    (~(pc_predict[55] ^ i_btb_addr[25])) & (~(pc_predict[54] ^ i_btb_addr[24])) &
+
+    (~(pc_predict[53] ^ i_btb_addr[23])) & (~(pc_predict[52] ^ i_btb_addr[22])) &
+    (~(pc_predict[51] ^ i_btb_addr[21])) & (~(pc_predict[50] ^ i_btb_addr[20])) &
+    (~(pc_predict[49] ^ i_btb_addr[19])) & (~(pc_predict[48] ^ i_btb_addr[18])) &
+    (~(pc_predict[47] ^ i_btb_addr[17])) & (~(pc_predict[46] ^ i_btb_addr[16])) &
+
+    (~(pc_predict[45] ^ i_btb_addr[15])) & (~(pc_predict[44] ^ i_btb_addr[14])) &
+    (~(pc_predict[43] ^ i_btb_addr[13])) & (~(pc_predict[42] ^ i_btb_addr[12])) &
+    (~(pc_predict[41] ^ i_btb_addr[11])) & (~(pc_predict[40] ^ i_btb_addr[10])) &
+    (~(pc_predict[39] ^ i_btb_addr[ 9])) & (~(pc_predict[38] ^ i_btb_addr[ 8])) &
+
+    (~(pc_predict[37] ^ i_btb_addr[ 7])) & (~(pc_predict[36] ^ i_btb_addr[ 6])) &
+    (~(pc_predict[35] ^ i_btb_addr[ 5])) & (~(pc_predict[34] ^ i_btb_addr[ 4])) &
+    (~(pc_predict[33] ^ i_btb_addr[ 3])) & (~(pc_predict[32] ^ i_btb_addr[ 2]));
+
+assign hit = pre_hit & pc_predict[63] & ~i_ctrl_execute;
+assign o_predict_state = pc_predict[63:62];
+
+always @(*) begin
+	if (hit) 
+		o_pc_predict = pc_predict[31:0];
+	else
+		o_pc_predict = i_pc_four;
+end
+
+endmodule
+

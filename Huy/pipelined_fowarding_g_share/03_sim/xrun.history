@@ -1,0 +1,2 @@
+#e1(10Dec2025:14:20:09): source ./xcelium.d/env.d/env.history.10Dec2025_14_20_09
+s1(10Dec2025:14:20:09):  xrun -access +rwc -f ./flist.f 
