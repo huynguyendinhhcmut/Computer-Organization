@@ -111,6 +111,7 @@ The report must include sections for **introduction, methodology, results, and c
 ## Block Diagram
 <img width="4057" height="2872" alt="1_bit_predict" src="https://github.com/user-attachments/assets/ab08c9c5-646f-42d9-8a53-4014a8b3d8b5" />
 <img width="4056" height="2872" alt="2_bit_predict" src="https://github.com/user-attachments/assets/1827b9c8-4eb1-45e7-9e8a-1a06000d90df" />
+<img width="4056" height="2832" alt="G-share" src="https://github.com/user-attachments/assets/95e7716f-d92a-4e14-be1c-a0bb2fa84f03" />
 
 ## Benchmark Program
 The following assembly code was used as a benchmark to evaluate the performance of different prediction schemes. It features nested loops and frequent branching to stress-test the predictors.
