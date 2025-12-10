@@ -146,7 +146,7 @@ end:
 ```
 
 ### Branch Prediction Comparison
-<img width="1919" height="253" alt="image" src="https://github.com/user-attachments/assets/69142ec4-faeb-4c70-8f0d-2f7115f5cb17" />
+<img width="1910" height="223" alt="image" src="https://github.com/user-attachments/assets/914c4332-651a-436c-9672-6b0bfc2e2ca0" />
 
 ### Kit DE10 Implementation
 https://www.youtube.com/watch?v=mxOSGJVKNEY
