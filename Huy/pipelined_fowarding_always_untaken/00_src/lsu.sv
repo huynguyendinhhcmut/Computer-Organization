@@ -63,7 +63,7 @@ logic addr_is_hex03;
 logic addr_is_hex47;
 logic addr_is_lcd;
 logic pre_addr_is_sw, addr_is_sw;
-logic addr_is_key;
+logic pre_addr_is_key, addr_is_key;
 
 assign addr_is_mem   = ~i_lsu_addr[31] & ~i_lsu_addr[30] & ~i_lsu_addr[29] & ~i_lsu_addr[28] &
 							  ~i_lsu_addr[27] & ~i_lsu_addr[26] & ~i_lsu_addr[25] & ~i_lsu_addr[24] & 
@@ -106,7 +106,7 @@ assign pre_addr_is_sw    = ~i_lsu_addr[31] & ~i_lsu_addr[30] & ~i_lsu_addr[29] &
 							  ~i_lsu_addr[19] & ~i_lsu_addr[18] & ~i_lsu_addr[17] &  i_lsu_addr[16] & 
 							  ~i_lsu_addr[15] & ~i_lsu_addr[14] & ~i_lsu_addr[13] & ~i_lsu_addr[12];
 							  
-assign addr_is_key   = ~i_lsu_addr[31] & ~i_lsu_addr[30] & ~i_lsu_addr[29] &  i_lsu_addr[28] &
+assign pre_addr_is_key   = ~i_lsu_addr[31] & ~i_lsu_addr[30] & ~i_lsu_addr[29] &  i_lsu_addr[28] &
 							  ~i_lsu_addr[27] & ~i_lsu_addr[26] & ~i_lsu_addr[25] & ~i_lsu_addr[24] & 
 							  ~i_lsu_addr[23] & ~i_lsu_addr[22] & ~i_lsu_addr[21] & ~i_lsu_addr[20] & 
 							  ~i_lsu_addr[19] & ~i_lsu_addr[18] & ~i_lsu_addr[17] & ~i_lsu_addr[16] & 
@@ -132,92 +132,47 @@ memory mem (.i_clk(i_clk), .i_addr_even_1(addr_even_1), .i_addr_even_2(addr_even
 
 datagen data_gen1 (.i_wb_data(mem_ld_data), .i_sl_sel(i_sl_sel), .o_data_gen(data_gen)); // out data generate
 
-/*
 always_ff @(posedge i_clk or negedge i_reset) begin
     if (~i_reset) begin
-        o_ld_data <= 32'b0;
-    end else begin
-        o_ld_data <= 32'b0; 
-
-        if (addr_is_mem) begin
-            o_ld_data <= data_gen;
-        end else if (addr_is_sw) begin
-            o_ld_data <= i_io_sw;
-        end else if (addr_is_key) begin
-            o_ld_data <= {30'b0, i_io_key};
-        end else if (addr_is_ledr) begin
-            o_ld_data <= {15'b0, o_io_ledr[16:0]};
-        end else if (addr_is_ledg) begin
-            o_ld_data <= {15'b0, o_io_ledg[16:0]};
-        end else if (addr_is_lcd) begin
-            o_ld_data <= o_io_lcd;
-        end else if (addr_is_hex03) begin
-            o_ld_data <= {1'b0, o_io_hex3[6:0], 1'b0, o_io_hex2[6:0], 
-                          1'b0, o_io_hex1[6:0], 1'b0, o_io_hex0[6:0]};
-        end else if (addr_is_hex47) begin
-            o_ld_data <= {1'b0, o_io_hex7[6:0], 1'b0, o_io_hex6[6:0], 
-                          1'b0, o_io_hex5[6:0], 1'b0, o_io_hex4[6:0]};
-        end
+        addr_is_sw      <= 32'b0;
+        o_ld_data_ledr  <= 32'b0;
+        o_ld_data_ledg  <= 32'b0;
+        o_ld_data_lcd   <= 32'b0;
+        o_ld_data_hex03 <= 32'b0;
+        o_ld_data_hex47 <= 32'b0;
+    end 
+    else begin
+        addr_is_sw <= pre_addr_is_sw;
+        if (addr_is_ledr)
+            o_ld_data_ledr <= {15'b0, o_io_ledr[16:0]};
+        else
+            o_ld_data_ledr <= 32'b0;
+        if (addr_is_ledg)
+            o_ld_data_ledg <= {15'b0, o_io_ledg[16:0]};
+        else
+            o_ld_data_ledg <= 32'b0;
+        if (addr_is_lcd)
+            o_ld_data_lcd <= o_io_lcd;
+        else
+            o_ld_data_lcd <= 32'b0;
+        if (addr_is_hex03)
+            o_ld_data_hex03 <= {1'b0, o_io_hex3[6:0], 1'b0, o_io_hex2[6:0], 
+                                1'b0, o_io_hex1[6:0], 1'b0, o_io_hex0[6:0]};
+        else
+            o_ld_data_hex03 <= 32'b0;
+        if (addr_is_hex47)
+            o_ld_data_hex47 <= {1'b0, o_io_hex7[6:0], 1'b0, o_io_hex6[6:0], 
+                                1'b0, o_io_hex5[6:0], 1'b0, o_io_hex4[6:0]};
+        else
+            o_ld_data_hex47 <= 32'b0;
     end
-end
-*/
-
-always_ff @(posedge i_clk or negedge i_reset) begin
-	if (~i_reset)
-		addr_is_sw <= 32'b0;
-	else 
-            	addr_is_sw <= pre_addr_is_sw;
-end
-
-always_ff @(posedge i_clk or negedge i_reset) begin
-	if (~i_reset)
-		o_ld_data_ledr <= 32'b0;
-	else if (addr_is_ledr)
-            	o_ld_data_ledr <= {15'b0, o_io_ledr[16:0]};
-	else
-		o_ld_data_ledr <= 32'b0;
-end
-
-always_ff @(posedge i_clk or negedge i_reset) begin
-	if (~i_reset)
-		o_ld_data_ledg <= 32'b0;
-	else if (addr_is_ledg)
-            	o_ld_data_ledg <= {15'b0, o_io_ledg[16:0]};
-	else
-		o_ld_data_ledg <= 32'b0;
-end
-   
-always_ff @(posedge i_clk or negedge i_reset) begin
-	if (~i_reset)
-		o_ld_data_lcd <= 32'b0;
-	else if (addr_is_lcd) 
-            	o_ld_data_lcd <= o_io_lcd;
-	else
-		o_ld_data_lcd <= 32'b0;
-end
-
-always_ff @(posedge i_clk or negedge i_reset) begin
-	if (~i_reset)
-		o_ld_data_hex03 <= 32'b0;
-	else if (addr_is_hex03)
-            	o_ld_data_hex03 <= {1'b0, o_io_hex3[6:0], 1'b0, o_io_hex2[6:0], 
-                          1'b0, o_io_hex1[6:0], 1'b0, o_io_hex0[6:0]};
-	else
-		o_ld_data_hex03 <= 32'b0;
-end
-
-always_ff @(posedge i_clk or negedge i_reset) begin
-	if (~i_reset)
-		o_ld_data_hex47 <= 32'b0;
-	else if (addr_is_hex47)
-            	o_ld_data_hex47 <= {1'b0, o_io_hex7[6:0], 1'b0, o_io_hex6[6:0], 
-                          1'b0, o_io_hex5[6:0], 1'b0, o_io_hex4[6:0]};
-	else
-		o_ld_data_hex47 <= 32'b0;
 end
 
 logic check_addr_sw;
 assign check_addr_sw = pre_addr_is_sw | addr_is_sw;
+
+logic check_addr_key;
+assign check_addr_key = pre_addr_is_key | addr_is_key;
 
 always @(*) begin
 
@@ -227,7 +182,7 @@ always @(*) begin
             o_ld_data = data_gen;
         end if (check_addr_sw) begin
             o_ld_data = i_io_sw;
-        end if (addr_is_key) begin
+        end if (check_addr_key) begin
             o_ld_data = {30'b0, i_io_key};
         end if (addr_is_ledr) begin
             o_ld_data = o_ld_data_ledr;
@@ -297,5 +252,3 @@ decode_hex hexled6 (.in(io_hex6), .out(o_io_hex6));
 decode_hex hexled7 (.in(io_hex7), .out(o_io_hex7));
 
 endmodule
-
-
