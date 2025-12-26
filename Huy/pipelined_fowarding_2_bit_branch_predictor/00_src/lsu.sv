@@ -143,6 +143,7 @@ always_ff @(posedge i_clk or negedge i_reset) begin
     end 
     else begin
         addr_is_sw <= pre_addr_is_sw;
+		addr_is_key <= pre_addr_is_key;
         if (addr_is_ledr)
             o_ld_data_ledr <= {15'b0, o_io_ledr[16:0]};
         else
@@ -252,3 +253,4 @@ decode_hex hexled6 (.in(io_hex6), .out(o_io_hex6));
 decode_hex hexled7 (.in(io_hex7), .out(o_io_hex7));
 
 endmodule
+
